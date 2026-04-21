@@ -20,16 +20,16 @@ checkLogin();
 $lang = $_GET['lang'] ?? $_SESSION['lang'] ?? 'th';
 $_SESSION['lang'] = $lang;       // จำเลือกภาษาไว้ใน session เพื่อใช้ช่วงต่อไป
 $t = require "lang/{$lang}.php"; // โหลด array ข้อความแปลทั้งหมดลงใน $t
-$role    = $_SESSION['role'];     // student | teacher | staff
+$role = $_SESSION['role'];     // student | teacher | staff
 $user_id = $_SESSION['user_id'];  // รหัสนิสิต/username
 
 // ==================== Stats ====================
 // นับจำนวนคำขอแยกตามสถานะ แตกโลจิกตาม role
-$total    = 0; // คำขอทั้งหมด
-$pending  = 0; // รออนุมัติ
+$total = 0; // คำขอทั้งหมด
+$pending = 0; // รออนุมัติ
 $approved = 0; // อนุมัติแล้ว
 $rejected = 0; // ปฏิเสธ
- try {
+try {
     if ($role === 'staff') {
         // staff เห็นทุกคำขอในระบบ
         $stmt = $conn->query("SELECT status, COUNT(*) as count FROM internship_requests GROUP BY status");
@@ -45,9 +45,12 @@ $rejected = 0; // ปฏิเสธ
     // วนลูปเพื่อแยกจำนวนตามสถานะ (1=pending, 2=approved, 3=rejected)
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $total += $row['count'];
-        if ($row['status'] == 1) $pending  = $row['count'];
-        if ($row['status'] == 2) $approved = $row['count'];
-        if ($row['status'] == 3) $rejected = $row['count'];
+        if ($row['status'] == 1)
+            $pending = $row['count'];
+        if ($row['status'] == 2)
+            $approved = $row['count'];
+        if ($row['status'] == 3)
+            $rejected = $row['count'];
     }
 } catch (PDOException $e) {
     // หากมีข้อผิดพลาด ให้แสดง 0 ทั้งหมด (graceful fail)
@@ -55,8 +58,8 @@ $rejected = 0; // ปฏิเสธ
 
 // ==================== Student profile + internship ====================
 // ดึงโปรไฟล์นิสิตและคำขอฝึกงาน (สำหรับ student role เท่านั้น)
-$student_info     = null;
-$internship       = null;
+$student_info = null;
+$internship = null;
 $profile_photo_url = null; // URL รูปโปรไฟล์ (null = ยังไม่มีรูป)
 if ($role === 'student') {
     try {
@@ -130,14 +133,14 @@ try {
 // ==================== Helpers ====================
 // Map สถานะตัวเลข -> ข้อความ + สีที่จะนำไปแสดงใน UI
 $statusMap = [
-    1 => ['label' => $t['status_pending'],  'class' => 'pending',  'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)'],
+    1 => ['label' => $t['status_pending'], 'class' => 'pending', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)'],
     2 => ['label' => $t['status_approved'], 'class' => 'approved', 'color' => '#22c55e', 'bg' => 'rgba(34,197,94,0.1)'],
     3 => ['label' => $t['status_rejected'], 'class' => 'rejected', 'color' => '#ef4444', 'bg' => 'rgba(239,68,68,0.1)'],
 ];
 // Map สถานะเอกสาร (doc_status) -> ข้อความ + ไอคอน
 $docMap = [
-    0 => ['label' => $t['doc_none'],    'color' => '#9ca3af', 'icon' => '○'],
-    1 => ['label' => $t['doc_sent'],    'color' => '#f59e0b', 'icon' => '◐'],
+    0 => ['label' => $t['doc_none'], 'color' => '#9ca3af', 'icon' => '○'],
+    1 => ['label' => $t['doc_sent'], 'color' => '#f59e0b', 'icon' => '◐'],
     2 => ['label' => $t['doc_checked'], 'color' => '#22c55e', 'icon' => '●'],
 ];
 
@@ -147,7 +150,7 @@ $roleName = ['student' => $t['role_student'], 'teacher' => $t['role_teacher'], '
 // ตั้ง title และโหลด CSS ของ dashboard จากไฟล์ภายนอก (dashboard.css)
 // header.php จะ inject <link> อัตโนมัติเมื่อเห็น $extra_css
 $page_title = 'Dashboard';
-$extra_css  = 'dashboard.css'; // โหลด css/dashboard.css ผ่าน header.php
+$extra_css = 'dashboard.css'; // โหลด css/dashboard.css ผ่าน header.php
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
 ?>
@@ -166,13 +169,10 @@ require_once 'includes/navbar.php';
         <!-- User Card: avatar วงกลม (คลิกได้เพื่อเปลี่ยนรูปโปรไฟล์) -->
         <div class="db-user-card">
             <!-- ถ้าเป็น student ลิงก์ avatar ไปหน้าอัปโหลดรูป ถ้าไม่ใช่ก็เป็นแค่ div -->
-            <a href="student/upload_profile.php"
-               class="db-avatar-lg"
-               title="<?= $t['edit_profile'] ?>">
+            <a href="student/upload_profile.php" class="db-avatar-lg" title="<?= $t['edit_profile'] ?>">
                 <?php if ($profile_photo_url): ?>
                     <!-- มีรูปโปรไฟล์: แสดงรูป -->
-                    <img src="<?= htmlspecialchars($profile_photo_url) ?>"
-                         alt="<?= $t['profile_photo'] ?>">
+                    <img src="<?= htmlspecialchars($profile_photo_url) ?>" alt="<?= $t['profile_photo'] ?>">
                 <?php else: ?>
                     <!-- ไม่มีรูป: แสดงตัวอักษรแรกของชื่อแทน -->
                     <?= mb_strtoupper(mb_substr($_SESSION['fullname'], 0, 1, 'UTF-8'), 'UTF-8') ?>
@@ -508,20 +508,27 @@ require_once 'includes/navbar.php';
                     </div>
                 </div>
 
-                <!-- RIGHT: Profile card -->
+                <!-- RIGHT: Profile card — แสดงข้อมูลนิสิต/ผู้ใช้ -->
                 <div class="db-card db-card-profile">
                     <div class="db-profile-head">
-                        <a href="student/upload_profile.php" class="db-profile-avatar db-avatar-link"
-                            title="เปลี่ยนรูปโปรไฟล์">
-                            <?php if ($profile_photo_url): ?>
-                                <img src="<?= htmlspecialchars($profile_photo_url) ?>" alt="โปรไฟล์">
-                            <?php else: ?>
-                                <?= mb_strtoupper(mb_substr($_SESSION['fullname'], 0, 1, 'UTF-8'), 'UTF-8') ?>
-                            <?php endif; ?>
-                        </a>
+                        <!-- ไอคอน User แทนรูปโปรไฟล์ -->
+                        <div class="db-profile-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
                         <div>
-                            <div class="db-profile-name"><?= htmlspecialchars($_SESSION['fullname']) ?></div>
-                            <div class="db-profile-id"><?= htmlspecialchars($user_id) ?></div>
+                            <!-- ชื่อผู้ใช้จาก session -->
+                            <div class="db-profile-name">
+                                <?= htmlspecialchars($_SESSION['fullname']) ?>
+                            </div>
+                            <!-- รหัสนิสิต/บุคลากร -->
+                            <div class="db-profile-id">
+                                <?= htmlspecialchars($user_id) ?>
+                            </div>
                         </div>
                     </div>
 
@@ -543,8 +550,12 @@ require_once 'includes/navbar.php';
                                 if (!trim($v))
                                     continue; ?>
                                 <li class="db-profile-item">
-                                    <span class="db-profile-key"><?= $k ?></span>
-                                    <span class="db-profile-val"><?= htmlspecialchars($v) ?></span>
+                                    <span class="db-profile-key">
+                                        <?= $k ?>
+                                    </span>
+                                    <span class="db-profile-val">
+                                        <?= htmlspecialchars($v) ?>
+                                    </span>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
