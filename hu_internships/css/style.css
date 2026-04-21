@@ -1,0 +1,487 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+/* ================================================================
+   style.css — Global Stylesheet (ใช้ร่วมกันทุกหน้า)
+   โหลดจาก includes/header.php ทุกครั้งที่มีการโหลดหน้าใดๆ
+
+   ขอบเขตการใช้งาน:
+   └─ :root, body.dark-mode  → ตัวแปรสีระดับ global (ทุกหน้า)
+   └─ *, body, a            → reset + font + สีพื้นฐาน (ทุกหน้า)
+   └─ .navbar               → navbar bar (ทุกหน้า)
+   └─ .btn, .form-control    → ปุ่มและ input (ทุกหน้า)
+   └─ table, th, td         → style ตารางทั่วไป (ใช้บางหน้า)
+   └─ .teachers-grid        → grid อาจารย์ (index.php - section Teachers)
+   └─ .site-footer          → footer global (ทุกหน้า ผ่าน includes/footer.php)
+
+   ไม่รวม:
+   └─ Dashboard styles → อยู่ใน css/dashboard.css
+   └─ index.php-only → อยู่ใน css/index.css (hero, majors panel ฯลฯ)
+   ================================================================ */
+
+/* ประกาศตัวแปรสีระดับ Root (โทนสว่าง) สำหรับเรียกใช้งานทั้งเว็บ */
+:root {
+    --primary-color: #e50914;
+    /* สีแดงหลัก คล้าย Netflix */
+    --bg-color: #ffffff;
+    /* สีพื้นหลังของเว็บไซต์ */
+    --text-color: #111111;
+    /* สีตัวอักษรหลัก */
+    --card-bg: #f5f5f5;
+    /* สีพื้นหลังของกล่อง/การ์ดเนื้อหา */
+    --border-color: #e5e5e5;
+    /* สีเส้นขอบ */
+    --input-bg: #ffffff;
+    /* สีช่องกรอกข้อมูลในฟอร์ม */
+    --success-color: #4caf50;
+    /* สีเขียวสื่อถึงความสำเร็จ (อนุมัติ) */
+    --danger-color: #e50914;
+    /* สีแดงสื่อถึงอันตรายหรือยกเลิก (ปฏิเสธ) */
+    --warning-color: #ff9800;
+    /* สีส้มเพื่อแจ้งเตือน (รอดำเนินการ) */
+}
+
+/* เมื่อเว็บไซต์อยู่ในโหมดมืด (แท็ก body มีคลาส dark-mode) จะเปลี่ยนตัวแปรสีใหม่ทั้งหมด */
+body.dark-mode {
+    --bg-color: #141414;
+    /* เปลี่ยนพื้นหลังเป็นสีดำ-เทาเข้ม */
+    --text-color: #ffffff;
+    /* เปลี่ยนตัวอักษรเป็นสีขาว */
+    --card-bg: #1f1f1f;
+    /* เปลี่ยนสีกล่องการ์ดให้มืดลง */
+    --border-color: #333333;
+    /* ปรับสีขอบให้มืดลง */
+    --input-bg: #333333;
+    /* ปรับสีช่องฟอร์มให้มืดลง */
+}
+
+/* ตั้งค่าเริ่มต้นให้ทุกๆ Element ในหน้าเว็บ */
+* {
+    box-sizing: border-box;
+    /* บังคับอิงขนาดกว้างยาวแบบรวมขอบไปเลย (ชิ้นงานจะไม่ขยายเกินที่กำหนดเวลาเติม Padding) */
+    margin: 0;
+    /* ลบระยะห่างภายนอกตั้งต้น */
+    padding: 0;
+    /* ลบระยะห่างภายในตั้งต้น */
+}
+
+/* ตั้งคุมภาพรวมของทั้งแผ่นหน้าเว็บ */
+body {
+    font-family: 'Roboto', sans-serif;
+    /* บังคับใช้ฟอนต์ Roboto เป็นหลักในการแสดงผล */
+    background-color: var(--bg-color);
+    /* ใช้สีพื้นหลังจากตัวแปร */
+    color: var(--text-color);
+    /* ใช้สีตัวอักษรจากตัวแปร */
+    transition: background-color 0.3s ease, color 0.3s ease;
+    /* ใช้เอฟเฟกต์ Fade เวลามืด/สว่างค่อยๆ เปลี่ยนใน 0.3 วินาที */
+    line-height: 1.6;
+    /* ระยะความห่างระหว่างบรรทัดเพื่อให้อ่านง่าย */
+}
+
+/* ตั้งค่าลิงก์ (ตัวอักษรที่กดได้) ทั่วไป */
+a {
+    text-decoration: none;
+    /* เอาเส้นใต้ลิงก์ออก */
+    color: var(--primary-color);
+    /* ให้ตัวลิงก์เปลี่ยนเป็นสีแดง */
+    transition: color 0.2s;
+    /* ทำเอฟเฟกต์สีค่อยๆ เปลี่ยน */
+}
+
+/* ตั้งค่าเอฟเฟกต์เมื่อเอาเมาส์ชี้ไปที่ลิงก์ */
+a:hover {
+    color: #ff0f1e;
+    /* เปลี่ยนสีให้แดงสว่างขึ้นอีกนิด */
+}
+
+/* --- ส่วนของแถบนำทาง (Navbar) --- */
+.navbar {
+    background-color: var(--card-bg);
+    /* ให้พื้นหลังของบาร์สีเข้ากับเซ็ตสีกล่อง/การ์ด */
+    padding: 1rem 2rem;
+    /* เว้นขอบบนล่าง 1 ยูนิต, ซ้ายขวา 2 ยูนิต */
+    display: flex;
+    /* ใช้งาน Flexbox เพื่อให้เรียงปุ่มจากซ้ายไปขวาง่ายๆ */
+    justify-content: space-between;
+    /* ดันโลโก้ไว้ซ้ายสุด และดึงปุ่มต่างๆ ไปชิดขวาสุด */
+    align-items: center;
+    /* จัดทุกอย่างให้อยู่แนวกึ่งกลางของบาร์ (ไม่ลอยหรือจม) */
+    border-bottom: 1px solid var(--border-color);
+    /* ขีดเส้นใต้แถบเนวิเกเตอร์ */
+    position: sticky;
+    /* ทำให้ตัวบาร์ปาดติดจอตอนที่ไถเว็บเลื่อนลงมา */
+    top: 0;
+    /* ให้บาร์เกาะที่ด้านบนสุด (ระยะ 0) */
+    z-index: 1000;
+    /* กำหนดชั้นความสูง ให้ดึงบาร์ทับสิ่งของอื่นๆ เสมอ */
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* ตัวอักษรโลโก้ตรง Navbar */
+.navbar-brand {
+    font-size: 1.5rem;
+    /* ขนาดฟอนต์ใหญ่ */
+    font-weight: 700;
+    /* ทำเป็นตัวหนาทึบ */
+    color: var(--primary-color);
+    /* ให้กลายเป็นสีแดง */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* เว้นระยะห่างไอคอนด้านใน 10 พิกเซล */
+}
+
+/* ตัวเมนูลิงก์ที่เรียงกันในบาร์ */
+.nav-links {
+    list-style: none;
+    /* เอาเครื่องหมายจุด (Bullet) หน้าลิงก์ออก */
+    display: flex;
+    /* ให้ปุ่มลิงก์ตีเรียงเรียงต่อกันในแนวนอน */
+    gap: 1.5rem;
+    /* เว้นระยะห่างปุ่มลิงก์แต่ละอัน */
+    align-items: center;
+}
+
+.nav-links.right {
+    margin-left: auto;
+    /* ดันก้อนลิงก์ให้ปลิวไปชิดขวาสุดของบาร์ */
+}
+
+.nav-links a {
+    color: var(--text-color);
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+/* เมื่อเอาเมาส์ชี้ลิงก์ในบาร์ */
+.nav-links a:hover {
+    color: var(--primary-color);
+    /* เปลี่ยนสีให้กลายเป็นแดง */
+}
+
+/* --- ส่วนของปุ่มต่างๆ (Buttons) --- */
+.btn {
+    padding: 0.5rem 1rem;
+    /* ขนาดกล่องปุ่ม */
+    border: none;
+    /* ไม่เอาเส้นขอบ */
+    border-radius: 6px;
+    /* ปรับเหลี่ยมปุ่มให้โค้งมนดูนุ่มนวล */
+    cursor: pointer;
+    /* เปลี่ยนเมาส์เป็นรูปนิ้วมือเวลาชี้ */
+    font-weight: 500;
+    transition: all 0.2s ease;
+    /* เวลาเอาเมาส์ชี้ให้เอฟเฟกต์ลื่นไหล 0.2 วิ */
+    font-family: inherit;
+    /* ให้ใช้ฟอนต์ตัวเดียวกันกับที่ตั้งไว้ใน body */
+    font-size: 1rem;
+}
+
+/* ปุ่มสถานะปกติ (ปุ่มสีแดงหลัก) */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    /* ตัวหนังสือขาว */
+}
+
+/* เมื่อเอาเม้าส์วางบนปุ่มแดง */
+.btn-primary:hover {
+    background-color: #f40612;
+    /* แดงสว่างขึ้น */
+    transform: translateY(-2px);
+    /* เอฟเฟกต์ยกปุ่มลอยขึ้น 2 พิกเซล */
+    box-shadow: 0 4px 10px rgba(229, 9, 20, 0.4);
+    /* เกิดเงาฟุ้งกระจายใต้ปุ่ม */
+    color: #ffffff;
+}
+
+/* ปุ่มเพื่อการยกเลิก/ออกจากระบบ (ลักษณะโปร่งใส ขอบแดง) */
+.btn-danger {
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    /* ขอบสีแดงบางๆ */
+    color: var(--primary-color);
+    /* ตัวอักษรแดง */
+}
+
+/* เมื่อชี้เมาส์ที่ปุ่มออกจากระบบ */
+.btn-danger:hover {
+    background-color: var(--primary-color);
+    /* เปลี่ยนพื้นเป็นสีแดงไปเลย */
+    color: #ffffff;
+    /* ตัวหนังสือเป็นสีขาว */
+}
+
+/* กล่องครอบสัดส่วนเนื้อหาให้เว็บเป็นระเบียบไม่ออกนอกขอบ */
+.container {
+    max-width: 1200px;
+    /* จำกัดความกว้างเว็บไว้ที่ 1200 พิกเซล (จอใหญ่มากๆ ก็กว้างแค่นี้) */
+    margin: 0 auto;
+    /* ล็อกกล่องให้อยู่ตรงกลางจอเสมอ */
+    padding: 2rem;
+    /* เว้นขอบกันตัวอักษรชนกรอบ 2 ยูนิต */
+}
+
+/* --- ส่วนของกล่องกรอกข้อมูล (Forms) --- */
+.form-group {
+    margin-bottom: 1rem;
+    /* ขยับความห่างของกล่องข้อมูลแต่ละอัน 1 ช่องบรรทัด */
+}
+
+.form-group label {
+    display: block;
+    /* เอาลงมาอยู่คนละบรรทัดกับกล่องพิมพ์ */
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* ตัวกล่องกรอกรหัส/ยูสเซอร์เนม ฯลฯ */
+.form-control {
+    width: 100%;
+    /* กล่องยาว 100% เต็มบรรทัด */
+    padding: 0.75rem;
+    /* เว้นพื้นที้พิมพ์ด้านในให้พองขึ้นน่าพิมพ์ */
+    border: 1px solid var(--border-color);
+    /* ใส่ขอบจางแบบสวยๆ */
+    border-radius: 6px;
+    /* ทำหัวกล่องให้มน */
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-family: inherit;
+    transition: border-color 0.2s, background-color 0.3s;
+}
+
+/* เอฟเฟกต์เมื่อผู้ใช้เอาเมาส์กด (โฟกัส) เพื่อพิมพ์อักษร */
+.form-control:focus {
+    outline: none;
+    /* ลบหน้าขอบแบบโบราณออก */
+    border-color: var(--primary-color);
+    /* เน้นสีกรอบให้เป็นสีแดง */
+    box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.2);
+    /* เรืองแสงเป็นสีแดงๆ โดยรอบกล่องกรอกพิมพ์ */
+}
+
+/* --- หน้าตาของตารางต่างๆ (Tables) บนเว็บระบบยืมคืน --- */
+table {
+    width: 100%;
+    /* กางตารางกว้าง 100% เต็ม */
+    border-collapse: collapse;
+    /* ทำให้เส้นขอบตารางติดทับกัน ไม่เกิดเส้นคู่ซ้อน */
+    margin-top: 1rem;
+    /* เว้นพื้นที่ให้ห่างจากของด้านบน */
+    background-color: var(--card-bg);
+    /* โลยีลงสีตารางให้เข้ากับโหมด */
+    border-radius: 8px;
+    /* ทำให้มุมตารางมีความโค้งมน */
+    overflow: hidden;
+    /* เวลาปาดความโค้งแล้วเนื้อหาตารางไม่ให้ปริออกมานอกมุมตัด */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    /* สร้างมิติเงาใต้ตารางนิ่มๆ */
+}
+
+th,
+td {
+    padding: 1rem;
+    /* ขยายขนาดช่องย่อย */
+    text-align: left;
+    /* ตัวอักษรชิดซ้าย */
+    border-bottom: 1px solid var(--border-color);
+    /* ขีดเส้นใต้แต่ละบรรทัด */
+}
+
+/* ส่วนหัวของตาราง (Table Header) */
+th {
+    background-color: rgba(0, 0, 0, 0.05);
+    /* ใช้สีดำโปร่งใสเพื่อให้เกิดความทึบๆ คลุมหัวตาราง */
+    font-weight: 600;
+    /* ทำให้หัวข้อหนาพิเศษ */
+}
+
+/* ให้หัวข้อตารางเวลาที่เปิดเว็บเป็น Dark Mode สีจางลงเพื่อให้อ่านง่าย */
+body.dark-mode th {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* ลบส่วนขีดเส้นใต้บรรทัดสุดท้ายของตาราง (เพราะไม่อย่างนั้นมันจะซ้อนกับรัศมีตาราง) */
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* ขีดสีแถบเวลานำเมาส์ไปชี้ตัวแถวในตาราง */
+tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+body.dark-mode tr:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* ป้ายแสดงสถานะกลมๆ (Badges เช่น Pending, Approved) */
+.badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    /* ทำให้ตัวอักษรเป็นสีขาวเด่นออกมา */
+}
+
+/* ชุดสีสถานะ */
+.badge-pending {
+    background-color: var(--warning-color);
+}
+
+/* รอดำเนินการ = สีส้ม */
+.badge-approved {
+    background-color: var(--success-color);
+}
+
+/* อนุมัติแล้ว = สีเขียว */
+.badge-rejected {
+    background-color: var(--danger-color);
+}
+
+/* ถูกปฏิเสธ / ยกเลิก = สีแดง */
+
+/* กล่องอเนกประสงค์ของเว็บ (Cards) */
+.card {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    /* มุมขอบมน */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    /* สร้างเงาสวยๆ รอบกล่อง */
+    padding: 1.5rem;
+    /* ขยับตัวอักษรไม่ให้ชนกล่อง 1.5 ยูนิต */
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+/* ================================================================
+   TEACHERS GRID — ใช้ใน index.php, section#teachers
+   แสดงการ์ดอาจารย์แบบรูปภาพ + ชื่อ + ตำแหน่ง
+   รวมถึง News section ที่ใช้ .teachers-grid เป็น container
+   ================================================================ */
+
+/* Grid อาจารย์: เรียงการ์ดอัตโนมัติ min 300px/การ์ด */
+.teachers-grid {
+    display: grid;
+    /* auto-fill: สร้างการ์ดให้มากที่สุดเท่าที่พื้นที่เอื้ออำนวย กว้างไม่ต่ำกว่า 300px */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    /* ระยะห่างระหว่างการ์ด */
+    margin-top: 2rem;
+}
+
+.teacher-card {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    /* นำรูปภาพและตัวอักษรกองไว้ตรงกลางทั้งหมด */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* เมาส์ชี้การ์ดอาจารย์ ให้ยกแผ่นการ์ดลอยขึ้น */
+.teacher-card:hover {
+    transform: translateY(-5px);
+    /* เลื่อนลอยขึ้นในแนว Y ขึ้นด้านบน 5 จุด */
+    box-shadow: 0 8px 25px rgba(229, 9, 20, 0.15);
+    /* สาดเงาเป็นธีมสีแดงฟุ้งกระจายใต้การ์ดอาจารย์ */
+}
+
+/* กรอบรูปภาพอาจารย์ */
+.teacher-img {
+    width: 120px;
+    /* กว้าง 120px */
+    height: 120px;
+    /* สูง 120px เท่ากับเพื่อทำให้ภาพสมมาตร */
+    border-radius: 50%;
+    /* โค้งรัศมี 50% = กลายสภาพเป็นวงกลมโดยสมบูรณ์ */
+    object-fit: cover;
+    /* ล็อกสัดส่วนภาพให้เต็มวงกลมพอดี ไม่บิดเบี้ยว */
+    margin-bottom: 1rem;
+    border: 3px solid var(--primary-color);
+    /* ล้อมเส้นขอบรูปโปรไฟล์เป็นสีแดง */
+}
+
+/* ขนาดชื่ออาจารย์ */
+.teacher-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    /* ตัวหนา */
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+/* ตำแหน่งอาจารย์ */
+.teacher-position {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    /* เน้นตำแหน่งอาจารย์ด้วยสีแดงเพื่อดึงดูดสายตา */
+    margin-bottom: 1rem;
+}
+
+/* รายละเอียดอาจารย์ / ประวัติการศึกษา */
+.teacher-desc {
+    font-size: 0.9rem;
+    /* เล็กที่สุด */
+    color: var(--text-color);
+    opacity: 0.8;
+    /* ให้สีจางลง 80% ป้องกันการแย่งความสนใจจากชื่อ */
+}
+
+/* --- ลอจิกการสลับโหมดดวงอาทิตย์พระจันทร์ (Theme Icon Swapper) --- */
+/* ปิดซ่อนพระอาทิตย์ปกติ (แสดงในที่สว่าง) */
+#icon-sun {
+    display: none;
+}
+
+/* ถ้าตัวเว็บเป็นโหมดมืด (แท็ก body มี dark-mode) ให้โชว์ดวงอาทิตย์เพื่อให้พร้อมคลิกเป็นที่สว่าง */
+body.dark-mode #icon-sun {
+    display: block;
+}
+
+/* และซ่อนดวงจันทร์แทน เมื่อเว็บทำงานเป็นโหมดมืดเรียบร้อยแล้ว */
+/* ---- LIGHT MODE: ป้องกันตัวอักษรหายในฟอร์ม ---- */
+option {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+}
+
+/* placeholder สีอ่อนลงแต่ยังมองเห็นได้ใน light mode */
+.form-control::placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #777;
+    opacity: 1;
+}
+
+/* stat card ใน dashboard */
+.stat-card {
+    text-align: center;
+    padding: 2rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.stat-value {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
