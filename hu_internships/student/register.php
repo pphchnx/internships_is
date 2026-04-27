@@ -20,8 +20,8 @@ $user_id = $_SESSION['user_id'];
 $msg     = '';
 $error   = '';
 
-// ตรวจสอบว่านิสิตเคยยื่นคำขอแล้วหรือยัง
-$chk = $conn->prepare("SELECT request_id, company_name, status FROM internship_requests WHERE student_id = ? LIMIT 1");
+// ตรวจสอบว่านิสิตเคยยื่นคำขอที่ยังดำเนินการอยู่หรือไม่ (ยกเว้นสถานะ 9 = ยกเลิก)
+$chk = $conn->prepare("SELECT request_id, company_name, status FROM internship_requests WHERE student_id = ? AND status != 9 ORDER BY request_id DESC LIMIT 1");
 $chk->execute([$user_id]);
 $existing = $chk->fetch(PDO::FETCH_ASSOC);
 
