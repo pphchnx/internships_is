@@ -75,7 +75,7 @@ CREATE TABLE `internship_requests` (
   `company_name` VARCHAR(255),
   `company_address` TEXT,
   `contact_person` VARCHAR(100),
-  `status` INT DEFAULT 0, -- 0=รอรับเรื่อง 1=รับเรื่อง 2=อาจารย์อนุมัติ 3=ออกใบส่งตัว 4=เสร็จสิ้น 9=ยกเลิก
+  `status` INT DEFAULT 1,
   `request_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`student_id`) REFERENCES users(username)
 ) ENGINE=InnoDB;
