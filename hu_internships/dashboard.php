@@ -42,14 +42,15 @@ try {
         $stmt = $conn->prepare("SELECT status, COUNT(*) as count FROM internship_requests WHERE student_id = ? GROUP BY status");
         $stmt->execute([$user_id]);
     }
+    // วนลูปเพื่อแยกจำนวนตามสถานะ
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $total += $row['count'];
-        if ($row['status'] == 0) $pending  = $row['count'];
-        if ($row['status'] == 1) $pending  += $row['count'];
-        if ($row['status'] == 2) $approved  = $row['count'];
-        if ($row['status'] == 3) $approved  += $row['count'];
-        if ($row['status'] == 4) $approved  += $row['count'];
-        if ($row['status'] == 9) $rejected  = $row['count'];
+        if ($row['status'] == 0 || $row['status'] == 1)
+            $pending += $row['count'];
+        if ($row['status'] >= 2 && $row['status'] <= 4)
+            $approved += $row['count'];
+        if ($row['status'] == 9)
+            $rejected += $row['count'];
     }
 } catch (PDOException $e) {
     // หากมีข้อผิดพลาด ให้แสดง 0 ทั้งหมด (graceful fail)
@@ -131,14 +132,13 @@ try {
 
 // ==================== Helpers ====================
 // Map สถานะตัวเลข -> ข้อความ + สีที่จะนำไปแสดงใน UI
-// statusMap: map status int → label + color — Workflow 5 ขั้นตอน
 $statusMap = [
-    0 => ['label' => $t['status_0'], 'class' => 'pending',  'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)'],
-    1 => ['label' => $t['status_1'], 'class' => 'info',     'color' => '#06b6d4', 'bg' => 'rgba(6,182,212,0.1)'],
-    2 => ['label' => $t['status_2'], 'class' => 'approved',  'color' => '#22c55e', 'bg' => 'rgba(34,197,94,0.1)'],
-    3 => ['label' => $t['status_3'], 'class' => 'letter',   'color' => '#6366f1', 'bg' => 'rgba(99,102,241,0.1)'],
-    4 => ['label' => $t['status_4'], 'class' => 'done',     'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.1)'],
-    9 => ['label' => $t['status_9'], 'class' => 'rejected', 'color' => '#ef4444', 'bg' => 'rgba(239,68,68,0.1)'],
+    0 => ['label' => $t['status_pending_staff'] ?? 'รอเจ้าหน้าที่รับเรื่อง', 'class' => 'pending', 'color' => '#6b7280', 'bg' => 'rgba(107,114,128,0.1)'],
+    1 => ['label' => $t['status_pending'] ?? 'รับเรื่องเข้าระบบ', 'class' => 'pending', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)'],
+    2 => ['label' => $t['status_approved'] ?? 'อนุมัติแล้ว', 'class' => 'approved', 'color' => '#22c55e', 'bg' => 'rgba(34,197,94,0.1)'],
+    3 => ['label' => $t['status_doc_issued'] ?? 'ออกใบส่งตัว', 'class' => 'approved', 'color' => '#3b82f6', 'bg' => 'rgba(59,130,246,0.1)'],
+    4 => ['label' => $t['status_completed'] ?? 'เสร็จสิ้น', 'class' => 'approved', 'color' => '#8b5cf6', 'bg' => 'rgba(139,92,246,0.1)'],
+    9 => ['label' => $t['status_canceled'] ?? 'ยกเลิก/ให้แก้ไข', 'class' => 'rejected', 'color' => '#ef4444', 'bg' => 'rgba(239,68,68,0.1)'],
 ];
 // Map สถานะเอกสาร (doc_status) -> ข้อความ + ไอคอน
 $docMap = [
@@ -203,7 +203,7 @@ require_once 'includes/navbar.php';
             </a>
 
             <?php if ($role === 'student'): ?>
-                <a href="student/register.php" class="db-nav-link <?= $internship ? 'db-nav-disabled' : '' ?>">
+                <a href="student/internship_form.php" class="db-nav-link <?= $internship ? 'db-nav-disabled' : '' ?>">
                     <span class="db-nav-icon">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -329,7 +329,7 @@ require_once 'includes/navbar.php';
                 </p>
             </div>
             <?php if ($role === 'student' && !$internship): ?>
-                <a href="student/register.php" class="db-cta-btn">
+                <a href="student/internship_form.php" class="db-cta-btn">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <line x1="12" y1="5" x2="12" y2="19" />
                         <line x1="5" y1="12" x2="19" y2="12" />
@@ -406,6 +406,41 @@ require_once 'includes/navbar.php';
                             <?= $sm['label'] ?>
                         </span>
                     </div>
+
+                    <!-- แสดงหมายเหตุกรณีถูกปฏิเสธ (สถานะ 9) -->
+                    <?php if ($internship['status'] == 9 && !empty($internship['remark'])): ?>
+                        <div style="margin: -0.5rem 1.5rem 1.5rem 1.5rem; padding: 1rem; border-radius: 8px; background: rgba(239, 68, 68, 0.05); border-left: 4px solid #ef4444; color: #b91c1c; font-size: 0.9rem;">
+                            <strong style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                                ข้อผิดพลาด / หมายเหตุ:
+                            </strong>
+                            <?= nl2br(htmlspecialchars($internship['remark'])) ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- แสดงความยินดีและผลประเมินเมื่อเสร็จสิ้น (สถานะ 4) -->
+                    <?php if ($internship['status'] == 4): ?>
+                        <div style="margin: -0.5rem 1.5rem 1.5rem 1.5rem; padding: 1.5rem; border-radius: 8px; background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.05)); border: 1px solid rgba(34, 197, 94, 0.2);">
+                            <h4 style="margin: 0 0 1rem 0; color: #15803d; display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                การฝึกประสบการณ์วิชาชีพเสร็จสิ้นสมบูรณ์
+                            </h4>
+                            <p style="margin: 0 0 1rem 0; font-size: 0.95rem; color: #166534;">
+                                ขอแสดงความยินดีที่คุณผ่านการฝึกประสบการณ์วิชาชีพที่ <strong><?= htmlspecialchars($internship['company_name']) ?></strong> อย่างเป็นทางการ
+                            </p>
+                            
+                            <?php if (!empty($internship['advisor_note'])): ?>
+                            <div style="background: white; padding: 1rem; border-radius: 6px; border-left: 4px solid #10b981; font-size: 0.9rem; color: var(--text-color);">
+                                <strong style="display: block; margin-bottom: 0.5rem; color: #047857;">ข้อเสนอแนะ / ผลการประเมินจากอาจารย์นิเทศ:</strong>
+                                <?= nl2br(htmlspecialchars($internship['advisor_note'])) ?>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
 
                     <!-- Timeline ระยะเวลา -->
                     <?php if ($internship['internship_start']): ?>
@@ -499,15 +534,25 @@ require_once 'includes/navbar.php';
                                 <span class="db-remark-inline">— <?= htmlspecialchars($internship['remark']) ?></span>
                             <?php endif; ?>
                         </div>
-                        <a href="student/upload.php" class="db-upload-link">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <polyline points="16 16 12 12 8 16" />
-                                <line x1="12" y1="12" x2="12" y2="21" />
-                                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
-                            </svg>
-                            อัปโหลดเอกสาร
-                        </a>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <?php if ($internship['status'] == 3): ?>
+                                <a href="staff/print_letter.php?id=<?= $internship['request_id'] ?>" target="_blank" class="db-upload-link" style="background: rgba(234, 179, 8, 0.1); color: #ca8a04;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    ใบส่งตัว
+                                </a>
+                            <?php endif; ?>
+                            <a href="student/upload.php" class="db-upload-link" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <polyline points="16 16 12 12 8 16" />
+                                    <line x1="12" y1="12" x2="12" y2="21" />
+                                    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+                                </svg>
+                                อัปโหลดเอกสารรับรอง
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -580,7 +625,7 @@ require_once 'includes/navbar.php';
                 </div>
                 <h3 class="db-empty-title"><?= $t['no_requests'] ?></h3>
                 <p class="db-empty-desc"><?= $t['register_intro'] ?></p>
-                <a href="student/register.php" class="db-cta-btn" style="margin-top:1.25rem;">
+                <a href="student/internship_form.php" class="db-cta-btn" style="margin-top:1.25rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <line x1="12" y1="5" x2="12" y2="19" />
                         <line x1="5" y1="12" x2="19" y2="12" />
@@ -610,6 +655,11 @@ require_once 'includes/navbar.php';
                 </div>
                 <?php if ($role === 'staff'): ?>
                     <a href="staff/view_all.php" class="db-see-all-link"><?= $t['view_all'] ?> <svg width="13" height="13"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg></a>
+                <?php elseif ($role === 'teacher'): ?>
+                    <a href="teacher/view_students.php" class="db-see-all-link"><?= $t['view_all'] ?? 'ดูทั้งหมด' ?> <svg width="13" height="13"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <polyline points="9 18 15 12 9 6" />
                         </svg></a>
@@ -679,14 +729,8 @@ require_once 'includes/navbar.php';
                                     <td class="db-tbl-date"><?= date('d M Y', strtotime($r['request_date'])) ?></td>
                                     <?php if ($role !== 'student'): ?>
                                         <td>
-                                            <?php
-                                            $rid = $r['request_id'];
-                                            if ($role === 'staff') {
-                                                echo '<a href="staff/update_status.php?id='.$rid.'" class="btn btn-primary" style="padding:0.35rem 0.75rem;font-size:0.75rem;text-decoration:none;border-radius:6px;">จัดการ</a>';
-                                            } elseif ($role === 'teacher') {
-                                                echo '<a href="teacher/view_students.php?id='.$rid.'" class="btn btn-primary" style="padding:0.35rem 0.75rem;font-size:0.75rem;text-decoration:none;border-radius:6px;background:#22c55e;">อนุมัติ</a>';
-                                            }
-                                            ?>
+                                            <a href="staff/update_status.php?id=<?= $r['request_id'] ?>" class="btn btn-primary"
+                                                style="padding: 0.35rem 0.75rem; font-size: 0.75rem; text-decoration: none; border-radius: 6px;">แก้ไข</a>
                                         </td>
                                     <?php endif; ?>
                                 </tr>

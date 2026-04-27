@@ -20,7 +20,10 @@ require_once '../includes/navbar.php';
 
 <div class="container">
     <div class="card">
-        <h2 style="margin-bottom: 1.5rem; font-size: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;"><?= $t['manage_requests'] ?></h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+            <h2 style="font-size: 2rem; margin: 0;"><?= $t['manage_requests'] ?></h2>
+            <a href="../dashboard.php" class="btn" style="border: 1px solid var(--border-color); color: var(--text-color);">&larr; <?= $t['back'] ?? 'ย้อนกลับ' ?></a>
+        </div>
         <table style="margin-top:20px;">
             <thead>
                 <tr>
@@ -38,13 +41,7 @@ require_once '../includes/navbar.php';
                     <td style="opacity: 0.7; font-size: 0.9rem;">#<?= htmlspecialchars($req['request_id']) ?></td>
                     <td><strong><?= htmlspecialchars($req['fullname']) ?></strong> <br><span style="font-size: 0.85rem; opacity: 0.7;"><?= htmlspecialchars($req['student_id']) ?></span></td>
                     <td><strong><?= htmlspecialchars($req['company_name']) ?></strong></td>
-                    <?php
-                    $statusLabels = [1 => $t['status_pending'], 2 => $t['status_approved'], 3 => $t['status_rejected']];
-                    $statusClasses = [1 => 'pending', 2 => 'approved', 3 => 'rejected'];
-                    $sLabel = $statusLabels[$req['status']] ?? 'Unknown';
-                    $sClass = $statusClasses[$req['status']] ?? 'pending';
-                    ?>
-                    <td><span class="badge badge-<?= $sClass ?>"><?= $sLabel ?></span></td>
+                    <td><?= getStatusBadge($req['status'], $t, 'staff') ?></td>
                     <td><?= date('d M Y', strtotime($req['request_date'])) ?></td>
                     <td>
                         <a href="update_status.php?id=<?= $req['request_id'] ?>" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;"><?= $t['update_btn'] ?></a>

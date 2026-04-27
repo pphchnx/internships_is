@@ -395,12 +395,15 @@ require_once 'includes/header.php';
                     <div class="form-group">
                         <label for="password"><?= $t['password'] ?> <span class="required">*</span></label>
                         <input type="password" id="password" name="password" class="form-control"
-                               placeholder="<?= $t['password_short'] ?>" required>
+                               placeholder="<?= $t['password_short'] ?>" required oninput="checkPassMatch()">
                     </div>
                     <div class="form-group">
-                        <label for="password2"><?= $t['password_mismatch'] ?> <span class="required">*</span></label>
+                        <label for="password2"><?= $lang === 'en' ? 'Confirm Password' : 'ยืนยันรหัสผ่าน' ?> <span class="required">*</span></label>
                         <input type="password" id="password2" name="password2" class="form-control"
-                               placeholder="<?= $t['password_mismatch'] ?>" required>
+                               placeholder="<?= $lang === 'en' ? 'Re-enter password' : 'กรอกรหัสผ่านอีกครั้ง' ?>" required oninput="checkPassMatch()">
+                        <span id="passMismatchMsg" style="display:none; color:#ef4444; font-size:0.82rem; margin-top:0.3rem; display:block;">
+                            <?= $lang === 'en' ? 'Passwords do not match' : 'รหัสผ่านไม่ตรงกัน' ?>
+                        </span>
                     </div>
                 </div>
 
@@ -626,6 +629,26 @@ require_once 'includes/header.php';
     updateTypeBadge();
     majorSelect.addEventListener('change', updateTypeBadge);
 })();
+
+// Real-time password match check
+function checkPassMatch() {
+    var p1  = document.getElementById('password');
+    var p2  = document.getElementById('password2');
+    var msg = document.getElementById('passMismatchMsg');
+    if (!p1 || !p2 || !msg) return;
+    if (p2.value.length === 0) {
+        msg.style.display = 'none';
+        p2.style.borderColor = '';
+        return;
+    }
+    if (p1.value !== p2.value) {
+        msg.style.display = 'block';
+        p2.style.borderColor = '#ef4444';
+    } else {
+        msg.style.display = 'none';
+        p2.style.borderColor = '#22c55e';
+    }
+}
 </script>
 
 <?php require_once 'includes/footer.php'; ?>

@@ -264,3 +264,9 @@ INSERT INTO `news_activities` (`title`, `content`) VALUES
 
 ALTER TABLE students_info 
 ADD COLUMN profile_photo VARCHAR(255) NULL DEFAULT NULL;
+
+-- =====================================
+-- System Update (รันเฉพาะคำสั่งนี้หากเคยรัน install.sql ด้านบนไปแล้ว)
+-- =====================================
+ALTER TABLE internship_requests 
+ADD COLUMN certificate_file VARCHAR(255) DEFAULT NULL;

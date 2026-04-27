@@ -1,0 +1,108 @@
+/* ===== Dropdown Navbar Styles (navbar.css) ===== */
+.nav-dropdown {
+    position: relative;
+}
+
+.nav-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    padding: 0.5rem;
+    min-width: 200px;
+    list-style: none;
+    z-index: 999;
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown.open .nav-dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+/* สะพานเชื่อมรอยต่อ (Bridge) เพื่อให้เมาส์เลื่อนจากเมนูหลักลงมาที่ dropdown ได้โดยไม่หาย */
+.nav-dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 15px;
+    display: none;
+    z-index: 998;
+}
+
+.nav-dropdown:hover::after {
+    display: block;
+}
+
+/* Arrow indicator above dropdown */
+.nav-dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    background: var(--card-bg);
+    border-left: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
+    rotate: 45deg;
+}
+
+.nav-dropdown-menu li {
+    list-style: none;
+}
+
+.nav-dropdown-menu li a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 0.92rem;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+
+.nav-dropdown-menu li a:hover {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.nav-dropdown-menu li a svg {
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.nav-dropdown-menu li a:hover svg {
+    opacity: 1;
+    stroke: #fff;
+}
+
+/* Divider between items */
+.nav-dropdown-menu li + li {
+    border-top: 1px solid var(--border-color);
+    margin-top: 0.25rem;
+    padding-top: 0.25rem;
+}

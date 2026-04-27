@@ -1,6 +1,15 @@
 <?php
+/**
+ * index.php — หน้าแรกของเว็บไซต์ (Landing Page)
+ * หน้าที่:
+ * - แสดงข้อมูลแนะนำหลักสูตรและคณาจารย์
+ * - แสดงข่าวสารและกิจกรรมล่าสุด (ดึงจากฐานข้อมูล)
+ * - ส่วนนำเข้าสู่ระบบ (Hero Section) และสถิติภาพรวม
+ * - รองรับระบบ 2 ภาษา (ไทย/อังกฤษ)
+ */
 session_start();
 require_once 'includes/db_connect.php';
+require_once 'includes/functions.php';
 
 $lang = $_GET['lang'] ?? $_SESSION['lang'] ?? 'th';
 $_SESSION['lang'] = $lang;
@@ -162,7 +171,7 @@ require_once 'includes/navbar.php';
                     'name' => 'สาขาวิชาจิตวิทยา',
                     'name_en' => 'Psychology',
                     'desc' => 'ศึกษาพฤติกรรมมนุษย์ จิตวิทยาคลินิก และจิตวิทยาองค์การ',
-                    'url' => '#',       // TODO: เติม URL
+                    'url' => 'psychology_mockup.html',
                 ],
                 [
                     'degree' => 'ศศ.บ.',
@@ -353,7 +362,7 @@ require_once 'includes/navbar.php';
         </div>
         <div
             style="text-align:center; background:var(--bg-color); padding:1.5rem; border-radius:12px; border:1px solid var(--border-color);">
-            <video controls
+            <video controls autoplay muted loop playsinline
                 style="width:100%; max-width:800px; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.15);">
                 <source src="<?= htmlspecialchars($base_url) ?>/assets/videos/intro.mp4" type="video/mp4">
                 Your browser does not support the video tag.
@@ -510,28 +519,37 @@ require_once 'includes/navbar.php';
                 $news_rows = $stmt_news->fetchAll(PDO::FETCH_ASSOC);
                 if (count($news_rows) > 0):
                     foreach ($news_rows as $news):
+                        $has_img = !empty($news['news_image']);
                         ?>
-                        <div class="card" style="transition:transform 0.22s, box-shadow 0.22s; cursor:default;"
-                            onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'"
-                            onmouseout="this.style.transform='';this.style.boxShadow=''">
-                            <div
-                                style="display:flex; align-items:center; gap:0.5rem; color:var(--primary-color); font-weight:700; margin-bottom:0.75rem; font-size:0.8rem;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                                <?= date('d M Y', strtotime($news['created_at'])) ?>
+                        <div class="card news-card" style="padding:0; overflow:hidden; transition:transform 0.22s, box-shadow 0.22s; cursor:pointer;"
+                            onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.15)'"
+                            onmouseout="this.style.transform='';this.style.boxShadow=''"
+                            onclick="openNews(<?= $news['id'] ?>)">
+                            <?php if ($has_img): ?>
+                            <div style="height:180px; overflow:hidden; background:var(--bg-color);">
+                                <img src="<?= htmlspecialchars($base_url) ?>/assets/images/news/<?= htmlspecialchars($news['news_image']) ?>"
+                                    alt="<?= htmlspecialchars($news['title']) ?>"
+                                    style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s;"
+                                    onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''">
                             </div>
-                            <h3
-                                style="font-size:1rem; font-weight:700; margin-bottom:0.5rem; line-height:1.4; color:var(--text-color);">
-                                <?= htmlspecialchars($news['title']) ?>
-                            </h3>
-                            <p style="font-size:0.88rem; line-height:1.65; opacity:0.7; color:var(--text-color);">
-                                <?= htmlspecialchars(mb_substr($news['content'], 0, 110)) ?>...
-                            </p>
+                            <?php else: ?>
+                            <div style="height:120px; background:linear-gradient(135deg,rgba(229,9,20,0.1),rgba(229,9,20,0.05)); display:flex; align-items:center; justify-content:center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="1" opacity="0.4"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 0-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6Z"/></svg>
+                            </div>
+                            <?php endif; ?>
+                            <div style="padding:1.25rem;">
+                                <div style="display:flex; align-items:center; gap:0.5rem; color:var(--primary-color); font-weight:700; margin-bottom:0.6rem; font-size:0.78rem;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                                    <?= date('d M Y', strtotime($news['created_at'])) ?>
+                                </div>
+                                <h3 style="font-size:1rem; font-weight:700; margin-bottom:0.5rem; line-height:1.4; color:var(--text-color);">
+                                    <?= htmlspecialchars($news['title']) ?>
+                                </h3>
+                                <p style="font-size:0.87rem; line-height:1.65; opacity:0.7; color:var(--text-color);">
+                                    <?= htmlspecialchars(mb_substr($news['content'], 0, 90)) ?>...
+                                </p>
+                                <span style="display:inline-block; margin-top:.75rem; font-size:.8rem; color:var(--primary-color); font-weight:600;">อ่านต่อ →</span>
+                            </div>
                         </div>
                         <?php
                     endforeach;
@@ -548,6 +566,47 @@ require_once 'includes/navbar.php';
         </div>
     </div>
 </section>
+
+<!-- NEWS MODAL — แสดงข่าวเต็มๆ เมื่อกดการ์ด -->
+<div id="newsModal" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:1rem;" onclick="if(event.target===this)closeNews()">
+    <div style="background:var(--card-bg); border-radius:16px; max-width:720px; width:100%; max-height:88vh; overflow-y:auto; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.4); border-top:4px solid var(--primary-color);">
+        <button onclick="closeNews()" style="position:absolute; top:1rem; right:1rem; background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-color); opacity:0.5; line-height:1; z-index:10;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">&#x2715;</button>
+        <div id="newsModalImg" style="height:280px; overflow:hidden; border-radius:12px 12px 0 0; display:none;">
+            <img id="newsModalImgEl" src="" alt="" style="width:100%; height:100%; object-fit:cover;">
+        </div>
+        <div style="padding:2rem 2.5rem 2.5rem;">
+            <div id="newsModalDate" style="color:var(--primary-color); font-size:0.82rem; font-weight:700; margin-bottom:.75rem;"></div>
+            <h2 id="newsModalTitle" style="font-size:1.5rem; font-weight:800; margin-bottom:1.25rem; line-height:1.3; color:var(--text-color);"></h2>
+            <div id="newsModalContent" style="font-size:0.97rem; line-height:1.9; color:var(--text-color); opacity:0.85; white-space:pre-wrap;"></div>
+        </div>
+    </div>
+</div>
+
+<?php
+$news_json = [];
+try {
+    $s2 = $conn->query("SELECT * FROM news_activities ORDER BY created_at DESC LIMIT 6");
+    foreach ($s2->fetchAll(PDO::FETCH_ASSOC) as $n) {
+        $news_json[$n['id']] = ['title' => $n['title'], 'content' => $n['content'], 'date' => date('d M Y', strtotime($n['created_at'])), 'image' => $n['news_image'] ?? ''];
+    }
+} catch(Exception $e) {}
+?>
+<script>
+var newsData = <?= json_encode($news_json, JSON_UNESCAPED_UNICODE) ?>;
+var newsBase = '<?= htmlspecialchars($base_url) ?>/assets/images/news/';
+function openNews(id) {
+    var n = newsData[id]; if (!n) return;
+    document.getElementById('newsModalTitle').textContent   = n.title;
+    document.getElementById('newsModalContent').textContent = n.content;
+    document.getElementById('newsModalDate').textContent    = '📅 ' + n.date;
+    var imgWrap = document.getElementById('newsModalImg');
+    if (n.image) { document.getElementById('newsModalImgEl').src = newsBase + n.image; imgWrap.style.display = 'block'; }
+    else { imgWrap.style.display = 'none'; }
+    var m = document.getElementById('newsModal'); m.style.display = 'flex'; document.body.style.overflow = 'hidden';
+}
+function closeNews() { document.getElementById('newsModal').style.display = 'none'; document.body.style.overflow = ''; }
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeNews(); });
+</script>
 
 <!-- =============================================
      CTA SECTION

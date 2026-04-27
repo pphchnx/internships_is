@@ -1,7 +1,16 @@
 <?php
+/**
+ * student/view_status.php — ตรวจสอบสถานะการยื่นคำขอ
+ * หน้าที่:
+ * - แสดงรายการคำขอฝึกงานที่นิสิตเคยยื่นไว้
+ * - แสดงสถานะปัจจุบัน (Badge) และหมายเหตุจากเจ้าหน้าที่
+ * - อนุญาตให้แก้ไข (Edit) หรือลบ (Delete) ในกรณีที่ยังไม่ถูกอนุมัติ
+ * - ลิงก์ดาวน์โหลดใบส่งตัว (เมื่อสถานะอนุมัติ/ออกเอกสารแล้ว)
+ */
 session_start();
 require_once '../includes/db_connect.php';
 require_once '../includes/auth.php';
+require_once '../includes/functions.php';
 
 checkLogin();
 checkRole('student');
@@ -9,8 +18,8 @@ checkRole('student');
 // จัดการการลบคำขอ
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     $del_id = $_POST['delete_id'];
-    // อนุญาตให้ลบเฉพาะคำขอของตัวเองที่ยัง 'รอเจ้าหน้าที่' (status = 0) เท่านั้น
-    $del_stmt = $conn->prepare("DELETE FROM internship_requests WHERE request_id = ? AND student_id = ? AND status = 0");
+    // อนุญาตให้ลบเฉพาะคำขอของตัวเองที่เพิ่งยื่น (0) หรือถูกยกเลิก/ให้แก้ไข (9)
+    $del_stmt = $conn->prepare("DELETE FROM internship_requests WHERE request_id = ? AND student_id = ? AND status IN (0, 9)");
     $del_stmt->execute([$del_id, $_SESSION['user_id']]);
     header("Location: view_status.php");
     exit;
@@ -48,21 +57,27 @@ require_once '../includes/navbar.php';
                     <?php foreach($requests as $req): ?>
                     <tr>
                         <td style="padding: 10px; border-bottom: 1px solid var(--border-color);"><strong><?= htmlspecialchars($req['company_name']) ?></strong></td>
-                    <?php
-                    $statusLabels = [1 => $t['status_pending'], 2 => $t['status_approved'], 3 => $t['status_rejected']];
-                    $statusClasses = [1 => 'pending', 2 => 'approved', 3 => 'rejected'];
-                    $sLabel = $statusLabels[$req['status']] ?? 'Unknown';
-                    $sClass = $statusClasses[$req['status']] ?? 'pending';
-                    ?>
-                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color);"><span class="badge badge-<?= $sClass ?>"><?= $sLabel ?></span></td>
+                        <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
+                            <?= getStatusBadge($req['status'], $t) ?>
+                            <?php if ($req['status'] == 9 && !empty($req['remark'])): ?>
+                                <div style="margin-top: 0.5rem; font-size: 0.85rem; color: #b91c1c; background: rgba(239, 68, 68, 0.05); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #ef4444; max-width: 200px;">
+                                    <strong>หมายเหตุ:</strong> <?= nl2br(htmlspecialchars($req['remark'])) ?>
+                                </div>
+                            <?php endif; ?>
+                        </td>
                         <td style="padding: 10px; border-bottom: 1px solid var(--border-color);"><?= htmlspecialchars($req['contact_person'] ?: '-') ?></td>
                         <td style="padding: 10px; border-bottom: 1px solid var(--border-color);"><?= date('d M Y', strtotime($req['request_date'])) ?></td>
                         <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
-                            <?php if ($req['status'] == 0): ?>
-                            <form method="POST" action="" onsubmit="return confirm('<?= addslashes($t['confirm_cancel_request']) ?>');" style="margin: 0;">
-                                <input type="hidden" name="delete_id" value="<?= $req['request_id'] ?>">
-                                <button type="submit" class="btn" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; padding: 0.35rem 0.7rem; font-size: 0.8rem; cursor: pointer; border-radius: 4px;"><?= $t['cancel_request_btn'] ?></button>
-                            </form>
+                            <?php if ($req['status'] == 3): ?>
+                                <a href="../staff/print_letter.php?id=<?= $req['request_id'] ?>" target="_blank" class="btn" style="background: #eab308; color: white; border: none; padding: 0.35rem 0.7rem; font-size: 0.8rem; border-radius: 4px; text-decoration: none; display: inline-block;">📥 ดาวน์โหลดใบส่งตัว</a>
+                            <?php elseif ($req['status'] == 0 || $req['status'] == 9): ?>
+                            <div style="display:flex; gap:0.5rem; justify-content:flex-start;">
+                                <a href="internship_form.php?edit=<?= $req['request_id'] ?>" class="btn" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid #3b82f6; padding: 0.35rem 0.7rem; font-size: 0.8rem; border-radius: 4px; text-decoration: none;">แก้ไข</a>
+                                <form method="POST" action="" onsubmit="return confirm('<?= addslashes($t['confirm_cancel_request'] ?? 'ต้องการลบคำขอนี้ใช่หรือไม่?') ?>');" style="margin: 0;">
+                                    <input type="hidden" name="delete_id" value="<?= $req['request_id'] ?>">
+                                    <button type="submit" class="btn" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; padding: 0.35rem 0.7rem; font-size: 0.8rem; cursor: pointer; border-radius: 4px;"><?= $req['status'] == 9 ? ($t['delete_btn'] ?? 'ลบคำขอ') : $t['cancel_request_btn'] ?></button>
+                                </form>
+                            </div>
                             <?php else: ?>
                             <span style="font-size: 0.8rem; opacity: 0.5;"><?= $t['cannot_edit'] ?></span>
                             <?php endif; ?>

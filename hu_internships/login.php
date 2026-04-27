@@ -1,4 +1,11 @@
 <?php
+/**
+ * login.php — หน้าเข้าสู่ระบบ
+ * หน้าที่:
+ * - รับชื่อผู้ใช้และรหัสผ่านเพื่อตรวจสอบสิทธิ์
+ * - จัดเก็บข้อมูลผู้ใช้ลงใน Session (user_id, role, fullname)
+ * - Redirect ไปยังหน้า Dashboard เมื่อสำเร็จ
+ */
 session_start();
 require_once 'includes/db_connect.php';
 require_once 'includes/functions.php';
