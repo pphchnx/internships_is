@@ -9,8 +9,8 @@ checkRole('student');
 // จัดการการลบคำขอ
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     $del_id = $_POST['delete_id'];
-    // อนุญาตให้ลบเฉพาะคำขอของตัวเองที่ยัง 'รอดำเนินการ' (status = 1) เท่านั้น
-    $del_stmt = $conn->prepare("DELETE FROM internship_requests WHERE request_id = ? AND student_id = ? AND status = 1");
+    // อนุญาตให้ลบเฉพาะคำขอของตัวเองที่ยัง 'รอเจ้าหน้าที่' (status = 0) เท่านั้น
+    $del_stmt = $conn->prepare("DELETE FROM internship_requests WHERE request_id = ? AND student_id = ? AND status = 0");
     $del_stmt->execute([$del_id, $_SESSION['user_id']]);
     header("Location: view_status.php");
     exit;
@@ -58,7 +58,7 @@ require_once '../includes/navbar.php';
                         <td style="padding: 10px; border-bottom: 1px solid var(--border-color);"><?= htmlspecialchars($req['contact_person'] ?: '-') ?></td>
                         <td style="padding: 10px; border-bottom: 1px solid var(--border-color);"><?= date('d M Y', strtotime($req['request_date'])) ?></td>
                         <td style="padding: 10px; border-bottom: 1px solid var(--border-color);">
-                            <?php if ($req['status'] == 1): ?>
+                            <?php if ($req['status'] == 0): ?>
                             <form method="POST" action="" onsubmit="return confirm('<?= addslashes($t['confirm_cancel_request']) ?>');" style="margin: 0;">
                                 <input type="hidden" name="delete_id" value="<?= $req['request_id'] ?>">
                                 <button type="submit" class="btn" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; padding: 0.35rem 0.7rem; font-size: 0.8rem; cursor: pointer; border-radius: 4px;"><?= $t['cancel_request_btn'] ?></button>

@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$existing) {
                  company_phone, company_website, contact_person, contact_position,
                  contact_phone, contact_email, department,
                  internship_start, internship_end, work_days, work_hours, advisor_id, status)
-                VALUES (?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,1)
+                VALUES (?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,0)
             ");
             $stmt->execute([
                 $user_id, $company_name, $company_type, $company_address, $company_province,

@@ -42,15 +42,14 @@ try {
         $stmt = $conn->prepare("SELECT status, COUNT(*) as count FROM internship_requests WHERE student_id = ? GROUP BY status");
         $stmt->execute([$user_id]);
     }
-    // วนลูปเพื่อแยกจำนวนตามสถานะ (1=pending, 2=approved, 3=rejected)
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $total += $row['count'];
-        if ($row['status'] == 1)
-            $pending = $row['count'];
-        if ($row['status'] == 2)
-            $approved = $row['count'];
-        if ($row['status'] == 3)
-            $rejected = $row['count'];
+        if ($row['status'] == 0) $pending  = $row['count'];
+        if ($row['status'] == 1) $pending  += $row['count'];
+        if ($row['status'] == 2) $approved  = $row['count'];
+        if ($row['status'] == 3) $approved  += $row['count'];
+        if ($row['status'] == 4) $approved  += $row['count'];
+        if ($row['status'] == 9) $rejected  = $row['count'];
     }
 } catch (PDOException $e) {
     // หากมีข้อผิดพลาด ให้แสดง 0 ทั้งหมด (graceful fail)
@@ -132,10 +131,14 @@ try {
 
 // ==================== Helpers ====================
 // Map สถานะตัวเลข -> ข้อความ + สีที่จะนำไปแสดงใน UI
+// statusMap: map status int → label + color — Workflow 5 ขั้นตอน
 $statusMap = [
-    1 => ['label' => $t['status_pending'], 'class' => 'pending', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)'],
-    2 => ['label' => $t['status_approved'], 'class' => 'approved', 'color' => '#22c55e', 'bg' => 'rgba(34,197,94,0.1)'],
-    3 => ['label' => $t['status_rejected'], 'class' => 'rejected', 'color' => '#ef4444', 'bg' => 'rgba(239,68,68,0.1)'],
+    0 => ['label' => $t['status_0'], 'class' => 'pending',  'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)'],
+    1 => ['label' => $t['status_1'], 'class' => 'info',     'color' => '#06b6d4', 'bg' => 'rgba(6,182,212,0.1)'],
+    2 => ['label' => $t['status_2'], 'class' => 'approved',  'color' => '#22c55e', 'bg' => 'rgba(34,197,94,0.1)'],
+    3 => ['label' => $t['status_3'], 'class' => 'letter',   'color' => '#6366f1', 'bg' => 'rgba(99,102,241,0.1)'],
+    4 => ['label' => $t['status_4'], 'class' => 'done',     'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.1)'],
+    9 => ['label' => $t['status_9'], 'class' => 'rejected', 'color' => '#ef4444', 'bg' => 'rgba(239,68,68,0.1)'],
 ];
 // Map สถานะเอกสาร (doc_status) -> ข้อความ + ไอคอน
 $docMap = [
@@ -238,7 +241,7 @@ require_once 'includes/navbar.php';
                 </a>
 
             <?php elseif ($role === 'teacher'): ?>
-                <a href="#" class="db-nav-link">
+                <a href="teacher/view_students.php" class="db-nav-link">
                     <span class="db-nav-icon">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -676,8 +679,14 @@ require_once 'includes/navbar.php';
                                     <td class="db-tbl-date"><?= date('d M Y', strtotime($r['request_date'])) ?></td>
                                     <?php if ($role !== 'student'): ?>
                                         <td>
-                                            <a href="staff/update_status.php?id=<?= $r['request_id'] ?>" class="btn btn-primary"
-                                                style="padding: 0.35rem 0.75rem; font-size: 0.75rem; text-decoration: none; border-radius: 6px;">แก้ไข</a>
+                                            <?php
+                                            $rid = $r['request_id'];
+                                            if ($role === 'staff') {
+                                                echo '<a href="staff/update_status.php?id='.$rid.'" class="btn btn-primary" style="padding:0.35rem 0.75rem;font-size:0.75rem;text-decoration:none;border-radius:6px;">จัดการ</a>';
+                                            } elseif ($role === 'teacher') {
+                                                echo '<a href="teacher/view_students.php?id='.$rid.'" class="btn btn-primary" style="padding:0.35rem 0.75rem;font-size:0.75rem;text-decoration:none;border-radius:6px;background:#22c55e;">อนุมัติ</a>';
+                                            }
+                                            ?>
                                         </td>
                                     <?php endif; ?>
                                 </tr>
