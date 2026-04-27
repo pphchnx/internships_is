@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // 2. ตรวจสอบธีมที่บันทึกไว้ (ค่าเริ่มต้นคือ Dark Mode ตาม Netflix Style)
+    // 2. ตรวจสอบธีมที่บันทึกไว้ (ค่าเริ่มต้นคือ Dark Mode )
     if (storedTheme === 'light') {
         body.classList.remove('dark-mode');
         updateIcons(false);

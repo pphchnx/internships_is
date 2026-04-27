@@ -18,7 +18,7 @@ require_once 'includes/navbar.php';
 <section class="hero-section" style="background: linear-gradient(160deg, rgba(0,0,0,0.82) 0%, rgba(20,0,0,0.75) 100%),
            url('assets/images/index1.jpg') center / cover no-repeat fixed;
            min-height: 100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;
-           text-align:center; padding: 6rem 2rem 4rem; color:#fff; position:relative;">
+           text-align:center; padding: 10rem 2rem 5rem; color:#fff; position:relative;">
 
     <!-- Badge -->
     <div style="display:inline-flex; align-items:center; gap:0.5rem; background:rgba(229,9,20,0.15);
@@ -340,6 +340,29 @@ require_once 'includes/navbar.php';
 </section>
 
 <!-- =============================================
+     VIDEO SECTION
+     ============================================= -->
+<section class="index-section" style="background:var(--card-bg);">
+    <div class="container">
+        <div style="text-align:center; margin-bottom:2rem;">
+            <p
+                style="color:var(--primary-color); font-weight:700; font-size:0.85rem; text-transform:uppercase; letter-spacing:2px; margin-bottom:0.5rem;">
+                <?= $t['intro_video'] ?>
+            </p>
+            <h2 class="section-heading"><?= $t['intro_video_title'] ?></h2>
+        </div>
+        <div
+            style="text-align:center; background:var(--bg-color); padding:1.5rem; border-radius:12px; border:1px solid var(--border-color);">
+            <video controls
+                style="width:100%; max-width:800px; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.15);">
+                <source src="<?= htmlspecialchars($base_url) ?>/assets/videos/intro.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+</section>
+
+<!-- =============================================
      INTERNSHIP SYSTEM SECTION
      ============================================= -->
 <section id="internship" class="index-section" style="background:var(--card-bg);">
@@ -432,8 +455,15 @@ require_once 'includes/navbar.php';
                     $t_detail = $teacher['detail_en'] ?? ''; // เก็บอีเมลอาจารย์ ไม่ว่าจะภาษาไหน
                     $expected_img = 'assets/images/d' . intval($teacher['id']) . '.jpg';
                     $t_img = file_exists(__DIR__ . '/' . $expected_img) ? $expected_img : 'assets/images/t.jpg';
+                    $cv_file = 'assets/cv/d' . intval($teacher['id']) . '.pdf';
+                    $has_cv  = file_exists(__DIR__ . '/' . $cv_file);
                     ?>
+                    <?php if ($has_cv): ?>
+                    <a href="<?= htmlspecialchars($base_url . '/' . $cv_file) ?>" target="_blank" rel="noopener"
+                       class="teacher-card" style="display:block; text-decoration:none; cursor:pointer;">
+                    <?php else: ?>
                     <div class="teacher-card">
+                    <?php endif; ?>
                         <img src="<?= htmlspecialchars($base_url . '/' . $t_img) ?>" alt="<?= htmlspecialchars($t_name) ?>"
                             class="teacher-img">
                         <div class="teacher-name"><?= htmlspecialchars($t_name) ?></div>
@@ -446,7 +476,11 @@ require_once 'includes/navbar.php';
                                 <?= htmlspecialchars($t_detail) ?>
                             </div>
                         <?php endif; ?>
+                    <?php if ($has_cv): ?>
+                    </a>
+                    <?php else: ?>
                     </div>
+                    <?php endif; ?>
                     <?php
                 endwhile;
             } catch (PDOException $e) {
@@ -456,32 +490,7 @@ require_once 'includes/navbar.php';
     </div>
 </section>
 
-<!-- =============================================
-     VIDEO SECTION
-     ============================================= -->
-<section class="index-section" style="background:var(--card-bg);">
-    <div class="container">
-        <div style="text-align:center; margin-bottom:2rem;">
-            <p
-                style="color:var(--primary-color); font-weight:700; font-size:0.85rem; text-transform:uppercase; letter-spacing:2px; margin-bottom:0.5rem;">
-                <?= $t['intro_video'] ?>
-            </p>
-            <h2 class="section-heading"><?= $t['intro_video_title'] ?></h2>
-        </div>
-        <div
-            style="text-align:center; background:var(--bg-color); padding:1.5rem; border-radius:12px; border:1px solid var(--border-color);">
-            <video controls
-                style="width:100%; max-width:800px; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.15);">
-                <source src="<?= htmlspecialchars($base_url) ?>/assets/videos/intro.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-    </div>
-</section>
 
-<!-- =============================================
-     NEWS SECTION
-     ============================================= -->
 <section id="news" class="index-section" style="background:var(--bg-color);">
     <div class="container">
         <div

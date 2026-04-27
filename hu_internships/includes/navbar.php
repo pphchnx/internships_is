@@ -21,8 +21,10 @@
     <ul class="nav-links">
         <li><a href="<?= $base_url ?>/index.php"><?= $t['home'] ?></a></li>
         <li><a href="<?= $base_url ?>/index.php#about"><?= $t['curriculum'] ?></a></li>
+        <li><a href="<?= $base_url ?>/index.php#teachers"><?= $lang === 'en' ? 'Teachers' : 'อาจารย์' ?></a></li>
         <li><a href="<?= $base_url ?>/index.php#internship"><?= $t['internship'] ?></a></li>
         <li><a href="<?= $base_url ?>/index.php#news"><?= $t['news'] ?></a></li>
+        <li><a href="<?= $base_url ?>/about.html"><?= $lang === 'en' ? 'About' : 'เกี่ยวกับเรา' ?></a></li>
         <?php if (isset($_SESSION['user_id'])): ?>
             <li><a href="<?= $base_url ?>/dashboard.php"><?= $t['dashboard'] ?></a></li>
             <?php if ($_SESSION['role'] === 'student'): ?>

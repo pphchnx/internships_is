@@ -101,8 +101,10 @@ a:hover {
     /* เว้นขอบบนล่าง 1 ยูนิต, ซ้ายขวา 2 ยูนิต */
     display: flex;
     /* ใช้งาน Flexbox เพื่อให้เรียงปุ่มจากซ้ายไปขวาง่ายๆ */
-    justify-content: space-between;
-    /* ดันโลโก้ไว้ซ้ายสุด และดึงปุ่มต่างๆ ไปชิดขวาสุด */
+    gap: 0;
+    /* ระยะห่างควบคุมผ่าน margin-left ของแต่ละกลุ่มแทน */
+    justify-content: flex-start;
+    /* เรียงจากซ้ายไปขวา โลโก้ → เมนู → ปุ่มขวา */
     align-items: center;
     /* จัดทุกอย่างให้อยู่แนวกึ่งกลางของบาร์ (ไม่ลอยหรือจม) */
     border-bottom: 1px solid var(--border-color);
@@ -139,11 +141,13 @@ a:hover {
     gap: 1.5rem;
     /* เว้นระยะห่างปุ่มลิงก์แต่ละอัน */
     align-items: center;
+    margin-left: 3rem;
+    /* ระยะห่างจากโลโก้ไปยังเมนูแรก (Home) */
 }
 
 .nav-links.right {
     margin-left: auto;
-    /* ดันก้อนลิงก์ให้ปลิวไปชิดขวาสุดของบาร์ */
+    /* ดันก้อนปุ่มขวาสุด (Login/Register) ให้ชิดขวา */
 }
 
 .nav-links a {
