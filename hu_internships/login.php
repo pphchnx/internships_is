@@ -38,7 +38,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $page_title = $t['login'];
 $extra_css = 'login.css';
 require_once 'includes/header.php';
-// Note: Intentionally omitting navbar on login screen for Netflix aesthetic
 ?>
 
 <div class="login-container">
