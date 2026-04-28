@@ -229,7 +229,7 @@ $accents = [1 => '#4f4f4fb6', 2 => '#e50914', 3 => '#4f4f4fb6', 4 => '#e50914'];
 // ---- ฟังก์ชัน render การ์ดนิสิต ----
 function renderStudentCard($s, $yr, $ac)
 {
-    global $base_url;
+    global $base_url, $t;
     $photo = '';
     if (!empty($s['profile_photo'])) {
         $p = __DIR__ . '/uploads/profiles/' . $s['profile_photo'];
