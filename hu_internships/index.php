@@ -465,39 +465,153 @@ require_once 'includes/navbar.php';
                     $expected_img = 'assets/images/d' . intval($teacher['id']) . '.jpg';
                     $t_img = file_exists(__DIR__ . '/' . $expected_img) ? $expected_img : 'assets/images/t.jpg';
                     $cv_file = 'assets/cv/d' . intval($teacher['id']) . '.pdf';
-                    $has_cv  = file_exists(__DIR__ . '/' . $cv_file);
+                    $has_cv = file_exists(__DIR__ . '/' . $cv_file);
                     ?>
                     <?php if ($has_cv): ?>
-                    <a href="<?= htmlspecialchars($base_url . '/' . $cv_file) ?>" target="_blank" rel="noopener"
-                       class="teacher-card" style="display:block; text-decoration:none; cursor:pointer;">
-                    <?php else: ?>
-                    <div class="teacher-card">
-                    <?php endif; ?>
-                        <img src="<?= htmlspecialchars($base_url . '/' . $t_img) ?>" alt="<?= htmlspecialchars($t_name) ?>"
-                            class="teacher-img">
-                        <div class="teacher-name"><?= htmlspecialchars($t_name) ?></div>
-                        <div class="teacher-position"><?= htmlspecialchars($t_pos) ?></div>
-                        <?php if ($t_edu): ?>
-                            <div class="teacher-desc"><?= htmlspecialchars($t_edu) ?></div>
-                        <?php endif; ?>
-                        <?php if ($t_detail): ?>
-                            <div class="teacher-desc" style="font-size:0.82rem; opacity:0.65; margin-top:0.25rem;">
-                                <?= htmlspecialchars($t_detail) ?>
-                            </div>
-                        <?php endif; ?>
-                    <?php if ($has_cv): ?>
-                    </a>
+                        <a href="<?= htmlspecialchars($base_url . '/' . $cv_file) ?>" target="_blank" rel="noopener"
+                            class="teacher-card" style="display:block; text-decoration:none; cursor:pointer;">
+                        <?php else: ?>
+                            <div class="teacher-card">
+                            <?php endif; ?>
+                            <img src="<?= htmlspecialchars($base_url . '/' . $t_img) ?>" alt="<?= htmlspecialchars($t_name) ?>"
+                                class="teacher-img">
+                            <div class="teacher-name"><?= htmlspecialchars($t_name) ?></div>
+                            <div class="teacher-position"><?= htmlspecialchars($t_pos) ?></div>
+                            <?php if ($t_edu): ?>
+                                <div class="teacher-desc"><?= htmlspecialchars($t_edu) ?></div>
+                            <?php endif; ?>
+                            <?php if ($t_detail): ?>
+                                <div class="teacher-desc" style="font-size:0.82rem; opacity:0.65; margin-top:0.25rem;">
+                                    <?= htmlspecialchars($t_detail) ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($has_cv): ?>
+                        </a>
                     <?php else: ?>
                     </div>
-                    <?php endif; ?>
-                    <?php
+                <?php endif; ?>
+                <?php
                 endwhile;
             } catch (PDOException $e) {
             }
             ?>
-        </div>
+    </div>
     </div>
 </section>
+
+<!-- =============================================
+     STUDENTS PREVIEW SECTION
+     ============================================= -->
+<section id="students" class="index-section" style="background:var(--card-bg);">
+    <div class="container">
+        <div
+            style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+            <div>
+                <p
+                    style="color:var(--primary-color); font-weight:700; font-size:0.85rem; text-transform:uppercase; letter-spacing:2px; margin-bottom:0.5rem;">
+                    <?= $t['current_students_list'] ?>
+                </p>
+                <h2 class="section-heading" style="margin-bottom:0;"><?= $t['students_list_heading'] ?></h2>
+            </div>
+            <a href="<?= isset($_SESSION['user_id']) ? 'students.php' : 'login.php' ?>" class="btn btn-primary"
+                style="display:inline-flex;align-items:center;gap:0.5rem;font-size:0.9rem;padding:0.65rem 1.4rem;border-radius:8px;white-space:nowrap;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <?= $t['view_all_students'] ?>
+            </a>
+        </div>
+
+        <?php
+        // ปีคงที่: 65=ปี4, 66=ปี3, 67=ปี2(มีภาคพิเศษ), 68=ปี1(มีภาคพิเศษ)
+        $year_entry_map = [4 => '65', 3 => '66', 2 => '67', 1 => '68'];
+        $year_counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
+        try {
+            $stmt_sc = $conn->query("SELECT student_id FROM students_info si JOIN users u ON u.username=si.student_id WHERE u.role='student' AND u.status='active'");
+            foreach ($stmt_sc->fetchAll(PDO::FETCH_ASSOC) as $sc_row) {
+                $prefix = substr($sc_row['student_id'], 0, 2);
+                foreach ($year_entry_map as $yr => $code) {
+                    if ($prefix === $code) {
+                        $year_counts[$yr]++;
+                        break;
+                    }
+                }
+            }
+        } catch (PDOException $e) {
+        }
+
+        $accents = [1 => '#4f4f4fb6', 2 => '#e50914', 3 => '#4f4f4fb6', 4 => '#e50914'];
+        $dest = isset($_SESSION['user_id']) ? 'students.php' : 'login.php';
+        ?>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:1.25rem;">
+            <?php for ($yr = 4; $yr >= 1; $yr--):
+                $ac = $accents[$yr];
+                $code = $year_entry_map[$yr];
+                $has_section = in_array($code, ['67', '68']);
+                ?>
+                <div style="background:var(--bg-color); border:1px solid var(--border-color); border-radius:12px;
+                        overflow:hidden; transition:transform 0.22s, box-shadow 0.22s;"
+                    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 28px rgba(0,0,0,0.1)'"
+                    onmouseout="this.style.transform='';this.style.boxShadow=''">
+                    <div style="height:4px;background:<?= $ac ?>;"></div>
+                    <div style="padding:1.5rem;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+                            <span
+                                style="font-size:0.72rem;font-weight:700;color:<?= $ac ?>;letter-spacing:1px;text-transform:uppercase;"><?= $t['year_level_prefix'] ?>
+                                <?= $yr ?></span>
+                            <span style="font-size:0.68rem;opacity:0.38;color:var(--text-color);"><?= $t['student_code_prefix'] ?> <?= $code ?>xx</span>
+                        </div>
+                        <div style="font-size:3rem;font-weight:900;color:<?= $ac ?>;line-height:1;"><?= $year_counts[$yr] ?>
+                        </div>
+                        <div style="font-size:0.82rem;opacity:0.5;color:var(--text-color);margin-bottom:0.75rem;"><?= $t['people'] ?></div>
+
+                        <?php if ($has_section): ?>
+                            <div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-bottom:0.5rem;">
+                                <span
+                                    style="font-size:0.65rem;background:<?= $ac ?>18;color:<?= $ac ?>;border:1px solid <?= $ac ?>44;border-radius:20px;padding:0.15rem 0.55rem;font-weight:700;"><?= $t['regular'] ?></span>
+                                <span
+                                    style="font-size:0.65rem;background:<?= $ac ?>0e;color:<?= $ac ?>;border:1px solid <?= $ac ?>28;border-radius:20px;padding:0.15rem 0.55rem;font-weight:600;opacity:0.7;"><?= $t['special_program'] ?></span>
+                            </div>
+                        <?php endif; ?>
+
+                        <a href="<?= $dest ?>?year=<?= $yr ?>" style="display:flex;align-items:center;justify-content:center;gap:0.45rem;
+                              margin-top:<?= $has_section ? '0.5rem' : '1.25rem' ?>;padding:0.6rem;border-radius:8px;
+                              background:<?= $ac ?>;color:#fff;font-size:0.82rem;font-weight:700;
+                              text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'"
+                            onmouseout="this.style.opacity='1'">
+                            <?php if (!isset($_SESSION['user_id'])): ?>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2.5">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                </svg>
+                            <?php else: ?>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2.5">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                </svg>
+                            <?php endif; ?>
+                            <?= $t['view_list'] ?>
+                        </a>
+                    </div>
+                </div>
+            <?php endfor; ?>
+        </div>
+        <?php if (!isset($_SESSION['user_id'])): ?>
+            <p style="margin-top:0.85rem;font-size:0.8rem;opacity:0.4;color:var(--text-color);text-align:center;">
+                <?= $t['login_to_view_students'] ?>
+            </p>
+        <?php endif; ?>
+    </div>
+</section>
+
+
+
 
 
 <section id="news" class="index-section" style="background:var(--bg-color);">
@@ -521,34 +635,50 @@ require_once 'includes/navbar.php';
                     foreach ($news_rows as $news):
                         $has_img = !empty($news['news_image']);
                         ?>
-                        <div class="card news-card" style="padding:0; overflow:hidden; transition:transform 0.22s, box-shadow 0.22s; cursor:pointer;"
+                        <div class="card news-card"
+                            style="padding:0; overflow:hidden; transition:transform 0.22s, box-shadow 0.22s; cursor:pointer;"
                             onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.15)'"
-                            onmouseout="this.style.transform='';this.style.boxShadow=''"
-                            onclick="openNews(<?= $news['id'] ?>)">
+                            onmouseout="this.style.transform='';this.style.boxShadow=''" onclick="openNews(<?= $news['id'] ?>)">
                             <?php if ($has_img): ?>
-                            <div style="height:180px; overflow:hidden; background:var(--bg-color);">
-                                <img src="<?= htmlspecialchars($base_url) ?>/assets/images/news/<?= htmlspecialchars($news['news_image']) ?>"
-                                    alt="<?= htmlspecialchars($news['title']) ?>"
-                                    style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s;"
-                                    onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''">
-                            </div>
+                                <div style="height:180px; overflow:hidden; background:var(--bg-color);">
+                                    <img src="<?= htmlspecialchars($base_url) ?>/assets/images/news/<?= htmlspecialchars($news['news_image']) ?>"
+                                        alt="<?= htmlspecialchars($news['title']) ?>"
+                                        style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s;"
+                                        onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''">
+                                </div>
                             <?php else: ?>
-                            <div style="height:120px; background:linear-gradient(135deg,rgba(229,9,20,0.1),rgba(229,9,20,0.05)); display:flex; align-items:center; justify-content:center;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="1" opacity="0.4"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 0-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6Z"/></svg>
-                            </div>
+                                <div
+                                    style="height:120px; background:linear-gradient(135deg,rgba(229,9,20,0.1),rgba(229,9,20,0.05)); display:flex; align-items:center; justify-content:center;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+                                        stroke="var(--primary-color)" stroke-width="1" opacity="0.4">
+                                        <path
+                                            d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 0-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+                                        <path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6Z" />
+                                    </svg>
+                                </div>
                             <?php endif; ?>
                             <div style="padding:1.25rem;">
-                                <div style="display:flex; align-items:center; gap:0.5rem; color:var(--primary-color); font-weight:700; margin-bottom:0.6rem; font-size:0.78rem;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                                <div
+                                    style="display:flex; align-items:center; gap:0.5rem; color:var(--primary-color); font-weight:700; margin-bottom:0.6rem; font-size:0.78rem;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                        <line x1="16" y1="2" x2="16" y2="6" />
+                                        <line x1="8" y1="2" x2="8" y2="6" />
+                                        <line x1="3" y1="10" x2="21" y2="10" />
+                                    </svg>
                                     <?= date('d M Y', strtotime($news['created_at'])) ?>
                                 </div>
-                                <h3 style="font-size:1rem; font-weight:700; margin-bottom:0.5rem; line-height:1.4; color:var(--text-color);">
+                                <h3
+                                    style="font-size:1rem; font-weight:700; margin-bottom:0.5rem; line-height:1.4; color:var(--text-color);">
                                     <?= htmlspecialchars($news['title']) ?>
                                 </h3>
                                 <p style="font-size:0.87rem; line-height:1.65; opacity:0.7; color:var(--text-color);">
                                     <?= htmlspecialchars(mb_substr($news['content'], 0, 90)) ?>...
                                 </p>
-                                <span style="display:inline-block; margin-top:.75rem; font-size:.8rem; color:var(--primary-color); font-weight:600;">อ่านต่อ →</span>
+                                <span
+                                    style="display:inline-block; margin-top:.75rem; font-size:.8rem; color:var(--primary-color); font-weight:600;">อ่านต่อ
+                                    →</span>
                             </div>
                         </div>
                         <?php
@@ -568,16 +698,26 @@ require_once 'includes/navbar.php';
 </section>
 
 <!-- NEWS MODAL — แสดงข่าวเต็มๆ เมื่อกดการ์ด -->
-<div id="newsModal" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:1rem;" onclick="if(event.target===this)closeNews()">
-    <div style="background:var(--card-bg); border-radius:16px; max-width:720px; width:100%; max-height:88vh; overflow-y:auto; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.4); border-top:4px solid var(--primary-color);">
-        <button onclick="closeNews()" style="position:absolute; top:1rem; right:1rem; background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-color); opacity:0.5; line-height:1; z-index:10;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">&#x2715;</button>
+<div id="newsModal"
+    style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:1rem;"
+    onclick="if(event.target===this)closeNews()">
+    <div
+        style="background:var(--card-bg); border-radius:16px; max-width:720px; width:100%; max-height:88vh; overflow-y:auto; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.4); border-top:4px solid var(--primary-color);">
+        <button onclick="closeNews()"
+            style="position:absolute; top:1rem; right:1rem; background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-color); opacity:0.5; line-height:1; z-index:10;"
+            onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">&#x2715;</button>
         <div id="newsModalImg" style="height:280px; overflow:hidden; border-radius:12px 12px 0 0; display:none;">
             <img id="newsModalImgEl" src="" alt="" style="width:100%; height:100%; object-fit:cover;">
         </div>
         <div style="padding:2rem 2.5rem 2.5rem;">
-            <div id="newsModalDate" style="color:var(--primary-color); font-size:0.82rem; font-weight:700; margin-bottom:.75rem;"></div>
-            <h2 id="newsModalTitle" style="font-size:1.5rem; font-weight:800; margin-bottom:1.25rem; line-height:1.3; color:var(--text-color);"></h2>
-            <div id="newsModalContent" style="font-size:0.97rem; line-height:1.9; color:var(--text-color); opacity:0.85; white-space:pre-wrap;"></div>
+            <div id="newsModalDate"
+                style="color:var(--primary-color); font-size:0.82rem; font-weight:700; margin-bottom:.75rem;"></div>
+            <h2 id="newsModalTitle"
+                style="font-size:1.5rem; font-weight:800; margin-bottom:1.25rem; line-height:1.3; color:var(--text-color);">
+            </h2>
+            <div id="newsModalContent"
+                style="font-size:0.97rem; line-height:1.9; color:var(--text-color); opacity:0.85; white-space:pre-wrap;">
+            </div>
         </div>
     </div>
 </div>
@@ -589,23 +729,24 @@ try {
     foreach ($s2->fetchAll(PDO::FETCH_ASSOC) as $n) {
         $news_json[$n['id']] = ['title' => $n['title'], 'content' => $n['content'], 'date' => date('d M Y', strtotime($n['created_at'])), 'image' => $n['news_image'] ?? ''];
     }
-} catch(Exception $e) {}
+} catch (Exception $e) {
+}
 ?>
 <script>
-var newsData = <?= json_encode($news_json, JSON_UNESCAPED_UNICODE) ?>;
-var newsBase = '<?= htmlspecialchars($base_url) ?>/assets/images/news/';
-function openNews(id) {
-    var n = newsData[id]; if (!n) return;
-    document.getElementById('newsModalTitle').textContent   = n.title;
-    document.getElementById('newsModalContent').textContent = n.content;
-    document.getElementById('newsModalDate').textContent    = '📅 ' + n.date;
-    var imgWrap = document.getElementById('newsModalImg');
-    if (n.image) { document.getElementById('newsModalImgEl').src = newsBase + n.image; imgWrap.style.display = 'block'; }
-    else { imgWrap.style.display = 'none'; }
-    var m = document.getElementById('newsModal'); m.style.display = 'flex'; document.body.style.overflow = 'hidden';
-}
-function closeNews() { document.getElementById('newsModal').style.display = 'none'; document.body.style.overflow = ''; }
-document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeNews(); });
+    var newsData = <?= json_encode($news_json, JSON_UNESCAPED_UNICODE) ?>;
+    var newsBase = '<?= htmlspecialchars($base_url) ?>/assets/images/news/';
+    function openNews(id) {
+        var n = newsData[id]; if (!n) return;
+        document.getElementById('newsModalTitle').textContent = n.title;
+        document.getElementById('newsModalContent').textContent = n.content;
+        document.getElementById('newsModalDate').textContent = '📅 ' + n.date;
+        var imgWrap = document.getElementById('newsModalImg');
+        if (n.image) { document.getElementById('newsModalImgEl').src = newsBase + n.image; imgWrap.style.display = 'block'; }
+        else { imgWrap.style.display = 'none'; }
+        var m = document.getElementById('newsModal'); m.style.display = 'flex'; document.body.style.overflow = 'hidden';
+    }
+    function closeNews() { document.getElementById('newsModal').style.display = 'none'; document.body.style.overflow = ''; }
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeNews(); });
 </script>
 
 <!-- =============================================

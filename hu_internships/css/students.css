@@ -1,0 +1,542 @@
+/* ================================================================
+   students.css — Stylesheet สำหรับหน้า students.php
+   ================================================================ */
+
+/* ---- SECTION TABS (ภาคปกติ / ภาคพิเศษ) ---- */
+.section-tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.section-tab {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.87rem;
+    font-weight: 600;
+    color: var(--text-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+    font-family: inherit;
+    opacity: 0.6;
+}
+
+.section-tab:hover {
+    opacity: 1;
+    border-color: var(--stab-color, var(--primary-color));
+    color: var(--stab-color, var(--primary-color));
+}
+
+.section-tab.active {
+    background: var(--stab-color, var(--primary-color));
+    border-color: var(--stab-color, var(--primary-color));
+    color: #fff;
+    opacity: 1;
+}
+
+.stab-count {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.1rem 0.4rem;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.15);
+    min-width: 20px;
+    text-align: center;
+}
+
+.section-tab.active .stab-count {
+    background: rgba(255,255,255,0.25);
+}
+
+
+
+/* ---- HERO ---- */
+.students-hero {
+    background: linear-gradient(160deg, rgba(0,0,0,0.88) 0%, rgba(40,0,0,0.82) 100%),
+                url('../assets/images/index1.jpg') center / cover no-repeat fixed;
+    padding: 6rem 2rem 4rem;
+    text-align: center;
+    color: #fff;
+    position: relative;
+}
+
+.students-hero-content {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.students-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(229,9,20,0.15);
+    border: 1px solid rgba(229,9,20,0.4);
+    border-radius: 20px;
+    padding: 0.4rem 1.1rem;
+    font-size: 0.82rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #ff8080;
+    margin-bottom: 1.5rem;
+}
+
+.students-hero h1 {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+}
+
+.students-hero p {
+    font-size: 1rem;
+    opacity: 0.75;
+    margin-bottom: 2rem;
+}
+
+.students-hero-stats {
+    display: flex;
+    gap: 2.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hero-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hero-stat-num {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.hero-stat-label {
+    font-size: 0.78rem;
+    opacity: 0.65;
+    margin-top: 0.3rem;
+}
+
+/* ---- LOGIN GATE BANNER ---- */
+.login-gate-banner {
+    background: linear-gradient(90deg, rgba(229,9,20,0.08), rgba(229,9,20,0.03));
+    border-top: 3px solid var(--primary-color);
+    border-bottom: 1px solid rgba(229,9,20,0.2);
+    padding: 0.9rem 2rem;
+}
+
+.login-gate-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.92rem;
+    color: var(--text-color);
+}
+
+.login-gate-inner svg {
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.login-gate-inner a {
+    color: var(--primary-color);
+}
+
+/* ---- MAIN ---- */
+.students-main {
+    padding: 3rem 0;
+    min-height: 60vh;
+    background: var(--bg-color);
+}
+
+/* ---- YEAR TABS ---- */
+.year-tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0;
+}
+
+.year-tab {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+    margin-bottom: -2px;
+    border-radius: 4px 4px 0 0;
+    font-family: inherit;
+    opacity: 0.6;
+}
+
+.year-tab:hover {
+    opacity: 1;
+    color: var(--primary-color);
+}
+
+.year-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    opacity: 1;
+    background: rgba(229,9,20,0.04);
+}
+
+.tab-count {
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 20px;
+    min-width: 22px;
+    text-align: center;
+}
+
+.year-tab:not(.active) .tab-count {
+    background: var(--border-color);
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+/* ---- YEAR HEADER ---- */
+.year-panel {
+    animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.year-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-color);
+    flex-wrap: wrap;
+}
+
+.year-header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.year-badge {
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.year-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.year-code-hint {
+    font-size: 0.8rem;
+    font-weight: 400;
+    opacity: 0.45;
+}
+
+.year-subtitle {
+    font-size: 0.87rem;
+    opacity: 0.6;
+    color: var(--text-color);
+}
+
+.graduating-badge {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.year-count-pill {
+    background: rgba(229,9,20,0.1);
+    color: var(--primary-color);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.35rem 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(229,9,20,0.2);
+    white-space: nowrap;
+}
+
+/* ---- STUDENT GRID ---- */
+.students-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+}
+
+/* ---- STUDENT CARD ---- */
+.student-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    position: relative;
+    overflow: hidden;
+}
+
+.student-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(229,9,20,0.1);
+    border-color: rgba(229,9,20,0.3);
+}
+
+/* Avatar */
+.student-avatar {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.student-avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+}
+
+.student-avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), #c00);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+    border: 3px solid rgba(229,9,20,0.3);
+}
+
+.student-year-dot {
+    position: absolute;
+    bottom: 2px;
+    right: -2px;
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 10px;
+    border: 2px solid var(--card-bg);
+}
+
+/* Info */
+.student-info {
+    width: 100%;
+}
+
+.student-id {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    letter-spacing: 1px;
+    margin-bottom: 0.35rem;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.student-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.2rem;
+    line-height: 1.3;
+}
+
+.student-name-en {
+    font-size: 0.8rem;
+    opacity: 0.5;
+    margin-bottom: 0.75rem;
+}
+
+.student-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.75rem;
+}
+
+.contact-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    justify-content: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.contact-row svg {
+    flex-shrink: 0;
+    color: var(--primary-color);
+}
+
+.locked-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--text-color);
+    opacity: 0.45;
+    margin-bottom: 0.75rem;
+}
+
+.student-major {
+    margin-top: 0.5rem;
+}
+
+.student-major span {
+    font-size: 0.72rem;
+    background: rgba(229,9,20,0.08);
+    color: var(--primary-color);
+    border: 1px solid rgba(229,9,20,0.15);
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* ---- BLUR OVERLAY (login gate per card) ---- */
+.card-blurred {
+    position: relative;
+}
+
+.blur-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(var(--card-bg-rgb, 245,245,245), 0.7);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+
+body.dark-mode .blur-overlay {
+    background: rgba(31,31,31,0.75);
+}
+
+.blur-login-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary-color);
+    color: #fff !important;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(229,9,20,0.35);
+}
+
+.blur-login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229,9,20,0.45);
+}
+
+/* ---- EMPTY STATE ---- */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    opacity: 0.45;
+    color: var(--text-color);
+}
+
+.empty-state p {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+}
+
+/* ---- CTA ---- */
+.students-cta {
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    padding: 4rem 2rem;
+}
+
+.students-cta h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    color: var(--text-color);
+}
+
+.students-cta p {
+    font-size: 1rem;
+    opacity: 0.7;
+    max-width: 520px;
+    margin: 0 auto;
+    color: var(--text-color);
+    line-height: 1.7;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 640px) {
+    .students-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .year-tab {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+    .year-header {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 400px) {
+    .students-grid {
+        grid-template-columns: 1fr;
+    }
+}
