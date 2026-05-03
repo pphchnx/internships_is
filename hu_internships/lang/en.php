@@ -259,5 +259,11 @@ return [
     'view_all_students' => 'View All Students',
     'view_list' => 'View List',
     'login_to_view_students' => '🔒 You must login to view the student list',
+    'upload_cert' => 'Upload Certificate',
+    'add_photo' => '+Photo',
+    'no_request_data' => 'No request data available',
+    'good_morning' => 'Good morning',
+    'good_afternoon' => 'Good afternoon',
+    'good_evening' => 'Good evening',
 ];
 ?>

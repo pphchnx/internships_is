@@ -212,7 +212,7 @@ require_once 'includes/navbar.php';
                             <line x1="9" y1="15" x2="15" y2="15" />
                         </svg>
                     </span>
-                    ยื่นคำขอฝึกงาน
+                    <?= $t['register_internship'] ?>
                     <?php if ($internship): ?>
                         <span class="db-nav-badge">✓</span>
                     <?php endif; ?>
@@ -237,7 +237,7 @@ require_once 'includes/navbar.php';
                             <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
                         </svg>
                     </span>
-                    อัปโหลดเอกสาร
+                    <?= $t['upload_cert'] ?>
                 </a>
 
             <?php elseif ($role === 'teacher'): ?>
@@ -250,7 +250,7 @@ require_once 'includes/navbar.php';
                             <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                         </svg>
                     </span>
-                    นิสิตในความดูแล
+                    <?= $t['students_in_care'] ?>
                 </a>
 
             <?php elseif ($role === 'staff'): ?>
@@ -265,7 +265,7 @@ require_once 'includes/navbar.php';
                             <line x1="3" y1="18" x2="3.01" y2="18" />
                         </svg>
                     </span>
-                    รายการทั้งหมด
+                    <?= $t['manage_requests'] ?>
                 </a>
                 <a href="staff/manage_documents.php" class="db-nav-link">
                     <span class="db-nav-icon">
@@ -274,7 +274,7 @@ require_once 'includes/navbar.php';
                             <polyline points="14 2 14 8 20 8" />
                         </svg>
                     </span>
-                    จัดการเอกสาร
+                    <?= $t['manage_documents'] ?>
                 </a>
             <?php endif; ?>
 
@@ -289,7 +289,7 @@ require_once 'includes/navbar.php';
                     </span>
                     <?= $t['edit_profile'] ?>
                     <?php if (!$profile_photo_url): ?>
-                        <span class="db-nav-badge" style="background:#f59e0b;">+รูป</span>
+                        <span class="db-nav-badge" style="background:#f59e0b;"><?= $t['add_photo'] ?></span>
                     <?php endif; ?>
                 </a>
             <?php endif; ?>
@@ -301,7 +301,7 @@ require_once 'includes/navbar.php';
                         <line x1="21" y1="12" x2="9" y2="12" />
                     </svg>
                 </span>
-                ออกจากระบบ
+                <?= $t['logout'] ?>
             </a>
         </nav>
     </aside>
@@ -315,16 +315,13 @@ require_once 'includes/navbar.php';
                 <h1 class="db-heading">
                     <?php
                     $greeting_hour = (int) date('H');
-                    if ($greeting_hour < 12)
-                        echo 'อรุณสวัสดิ์';
-                    elseif ($greeting_hour < 17)
-                        echo 'สวัสดีตอนบ่าย';
-                    else
-                        echo 'สวัสดีตอนเย็น';
+                    if ($greeting_hour < 12) echo $t['good_morning'];
+                    elseif ($greeting_hour < 17) echo $t['good_afternoon'];
+                    else echo $t['good_evening'];
                     ?>, <span
                         style="color:var(--primary-color);"><?= htmlspecialchars(explode(' ', $_SESSION['fullname'])[0]) ?></span>
                 </h1>
-                <p class="db-subheading"><?= date('วันl ที่ j F Y', time()) ?> &nbsp;·&nbsp;
+                <p class="db-subheading"><?= $lang === 'en' ? date('l, j F Y') : date('วันl ที่ j F Y') ?> &nbsp;·&nbsp;
                     <?= $roleName[$role] ?? '' ?>
                 </p>
             </div>
@@ -334,7 +331,7 @@ require_once 'includes/navbar.php';
                         <line x1="12" y1="5" x2="12" y2="19" />
                         <line x1="5" y1="12" x2="19" y2="12" />
                     </svg>
-                    ยื่นคำขอฝึกงาน
+                    <?= $t['register_internship'] ?>
                 </a>
             <?php endif; ?>
         </div>
@@ -739,7 +736,7 @@ require_once 'includes/navbar.php';
                     </table>
                 </div>
             <?php else: ?>
-                <div class="db-tbl-empty">ยังไม่มีข้อมูลคำขอ</div>
+                <div class="db-tbl-empty"><?= $t['no_request_data'] ?></div>
             <?php endif; ?>
         </div>
 

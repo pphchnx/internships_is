@@ -259,5 +259,11 @@ return [
     'view_all_students' => 'ดูรายชื่อทั้งหมด',
     'view_list' => 'ดูรายชื่อ',
     'login_to_view_students' => '🔒 ต้องเข้าสู่ระบบก่อนจึงจะดูรายชื่อนิสิตได้',
+    'upload_cert' => 'อัปโหลดเอกสารรับรอง',
+    'add_photo' => '+รูป',
+    'no_request_data' => 'ยังไม่มีข้อมูลคำขอ',
+    'good_morning' => 'อรุณสวัสดิ์',
+    'good_afternoon' => 'สวัสดีตอนบ่าย',
+    'good_evening' => 'สวัสดีตอนเย็น',
 ];
 ?>
