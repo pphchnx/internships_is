@@ -36,19 +36,26 @@ function getStatusBadge($status, $t, $mode = 'default') {
             9 => $t['status_canceled'] ?? 'ยกเลิก/ให้แก้ไข'
         ];
     } else {
+        // mode 'default' — ใช้สำหรับนิสิต ต้อง map ตรงกับค่า status จริงในฐานข้อมูล
         $labels = [
-            0 => $t['status_pending'] ?? 'รอดำเนินการ',
-            1 => $t['status_approved'] ?? 'อนุมัติแล้ว',
-            2 => $t['status_rejected'] ?? 'ปฏิเสธ',
-            3 => $t['status_completed'] ?? 'เสร็จสิ้น',
-            9 => $t['status_fix'] ?? 'ให้แก้ไข'
+            0 => $t['status_pending_staff'] ?? 'รอเจ้าหน้าที่รับเรื่อง',
+            1 => $t['status_pending']       ?? 'รับเรื่องเข้าระบบ',
+            2 => $t['status_approved']      ?? 'อนุมัติแล้ว',
+            3 => $t['status_doc_issued']    ?? 'ออกใบส่งตัวแล้ว',
+            4 => $t['status_completed']     ?? 'ฝึกงานเสร็จสิ้น',
+            9 => $t['status_canceled']      ?? 'ยกเลิก / ให้แก้ไข'
         ];
     }
 
     $classes = [
-        0 => 'pending', 1 => 'pending', 2 => 'approved', 3 => 'approved', 4 => 'approved', 9 => 'rejected'
+        0 => 'pending',
+        1 => 'pending',
+        2 => 'approved',
+        3 => 'approved',
+        4 => 'approved',
+        9 => 'rejected'
     ];
-    if ($mode === 'default' && $status == 2) $classes[2] = 'rejected'; // Override for student view
+    // ลบ override เดิมที่ผิดพลาด (เคยทำให้ status=2 แสดงเป็น rejected สำหรับนิสิต)
 
     $label = $labels[$status] ?? 'Unknown';
     $class = $classes[$status] ?? 'pending';
